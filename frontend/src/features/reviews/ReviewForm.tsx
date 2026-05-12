@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { reviewsApi } from '@/api/reviews.api';
 import { RatingStarsInput } from '@/components/content/RatingStarsInput';
 import type { Review } from '@/types/review';
@@ -7,9 +8,12 @@ import type { Review } from '@/types/review';
 interface Props {
   contentId: string;
   existing: Review | null;
+  onDone?: () => void;
+  onCancel?: () => void;
 }
 
-export function ReviewForm({ contentId, existing }: Props) {
+export function ReviewForm({ contentId, existing, onDone, onCancel }: Props) {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const [rating, setRating] = useState<number>(existing?.rating ?? 0);
   const [body, setBody] = useState<string>(existing?.body ?? '');
@@ -34,8 +38,10 @@ export function ReviewForm({ contentId, existing }: Props) {
     onSuccess: () => {
       setError(null);
       invalidate();
+      onDone?.();
     },
-    onError: (err: any) => setError(err?.response?.data?.error?.message ?? 'Kaydedilemedi'),
+    onError: (err: any) =>
+      setError(err?.response?.data?.error?.message ?? t('reviews.form.saveFailed')),
   });
 
   const update = useMutation({
@@ -44,8 +50,10 @@ export function ReviewForm({ contentId, existing }: Props) {
     onSuccess: () => {
       setError(null);
       invalidate();
+      onDone?.();
     },
-    onError: (err: any) => setError(err?.response?.data?.error?.message ?? 'Güncellenemedi'),
+    onError: (err: any) =>
+      setError(err?.response?.data?.error?.message ?? t('reviews.form.updateFailed')),
   });
 
   const remove = useMutation({
@@ -55,6 +63,7 @@ export function ReviewForm({ contentId, existing }: Props) {
       setBody('');
       setSpoiler(false);
       invalidate();
+      onDone?.();
     },
   });
 
@@ -63,7 +72,7 @@ export function ReviewForm({ contentId, existing }: Props) {
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (rating < 0.5) {
-      setError('Lütfen bir puan seçin');
+      setError(t('reviews.form.selectRating'));
       return;
     }
     if (existing) update.mutate();
@@ -74,7 +83,7 @@ export function ReviewForm({ contentId, existing }: Props) {
     <form onSubmit={onSubmit} className="card space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-display text-lg font-bold text-ink">
-          {existing ? 'İncelemeni güncelle' : 'İnceleme yaz'}
+          {existing ? t('reviews.form.editTitle') : t('reviews.form.writeTitle')}
         </h3>
         <RatingStarsInput value={rating} onChange={setRating} size="md" disabled={isPending} />
       </div>
@@ -84,7 +93,7 @@ export function ReviewForm({ contentId, existing }: Props) {
         onChange={(e) => setBody(e.target.value)}
         rows={4}
         maxLength={5000}
-        placeholder="Bu içerik hakkında ne düşünüyorsun?"
+        placeholder={t('reviews.form.bodyPlaceholder')}
         className="w-full resize-y rounded-lg border border-white/10 bg-surface-raised px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-accent focus:outline-none"
         disabled={isPending}
       />
@@ -97,7 +106,7 @@ export function ReviewForm({ contentId, existing }: Props) {
           disabled={isPending}
           className="h-4 w-4 accent-accent"
         />
-        Spoiler içeriyor
+        {t('reviews.form.spoiler')}
       </label>
 
       {error && <p className="text-sm text-rating-low">{error}</p>}
@@ -107,16 +116,25 @@ export function ReviewForm({ contentId, existing }: Props) {
           <button
             type="button"
             onClick={() => {
-              if (confirm('İncelemeni silmek istediğine emin misin?')) remove.mutate();
+              if (confirm(t('reviews.form.deleteConfirm'))) remove.mutate();
             }}
             className="btn-ghost text-rating-low"
             disabled={isPending}
           >
-            Sil
+            {t('reviews.form.delete')}
+          </button>
+        )}
+        {onCancel && (
+          <button type="button" onClick={onCancel} className="btn-ghost" disabled={isPending}>
+            {t('reviews.cancel')}
           </button>
         )}
         <button type="submit" className="btn-outline" disabled={isPending}>
-          {isPending ? 'Kaydediliyor…' : existing ? 'Güncelle' : 'Yayınla'}
+          {isPending
+            ? t('reviews.form.saving')
+            : existing
+              ? t('reviews.form.update')
+              : t('reviews.form.publish')}
         </button>
       </div>
     </form>

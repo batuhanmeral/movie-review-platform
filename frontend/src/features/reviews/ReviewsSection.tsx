@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { Trans, useTranslation } from 'react-i18next';
 import { reviewsApi } from '@/api/reviews.api';
 import { useAuthStore } from '@/features/auth/authStore';
 import type { ReviewSort } from '@/types/review';
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export function ReviewsSection({ contentId }: Props) {
+  const { t } = useTranslation();
   const me = useAuthStore((s) => s.user);
   const [sort, setSort] = useState<ReviewSort>('newest');
 
@@ -26,44 +28,45 @@ export function ReviewsSection({ contentId }: Props) {
     enabled: Boolean(me),
   });
 
+  const otherItems = (list?.items ?? []).filter((r) => r.id !== mine?.id);
+
   return (
     <section className="space-y-5">
       <div className="section-title flex items-center justify-between">
-        <h2>İncelemeler</h2>
+        <h2>{t('reviews.title')}</h2>
         <div className="flex items-center gap-2 text-xs">
-          <label className="text-ink-muted">Sırala:</label>
+          <label className="text-ink-muted">{t('reviews.sortLabel')}</label>
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as ReviewSort)}
             className="rounded-lg border border-white/10 bg-surface-raised px-2 py-1 text-ink focus:border-accent focus:outline-none"
           >
-            <option value="newest">Yeni</option>
-            <option value="popular">Popüler</option>
+            <option value="newest">{t('reviews.sortNewest')}</option>
+            <option value="popular">{t('reviews.sortPopular')}</option>
           </select>
         </div>
       </div>
 
-      {me ? (
-        <ReviewForm contentId={contentId} existing={mine ?? null} />
-      ) : (
+      {!me && (
         <div className="card text-center text-sm text-ink-muted">
-          İnceleme yazmak için{' '}
-          <Link to="/login" className="text-accent hover:underline">
-            giriş yap
-          </Link>
-          .
+          <Trans
+            i18nKey="reviews.loginPrompt"
+            components={[<Link key="login" to="/login" className="text-accent hover:underline" />]}
+          />
         </div>
       )}
 
+      {me && !mine && <ReviewForm contentId={contentId} existing={null} />}
+
+      {mine && <ReviewItem review={mine} contentId={contentId} isOwn />}
+
       {isLoading ? (
-        <div className="card text-center text-sm text-ink-muted">Yükleniyor…</div>
-      ) : !list || list.items.length === 0 ? (
-        <div className="card text-center text-sm text-ink-muted">
-          Henüz inceleme yok. İlk yazan sen ol!
-        </div>
+        <div className="card text-center text-sm text-ink-muted">{t('reviews.loading')}</div>
+      ) : otherItems.length === 0 && !mine ? (
+        <div className="card text-center text-sm text-ink-muted">{t('reviews.empty')}</div>
       ) : (
         <div className="space-y-3">
-          {list.items.map((r) => (
+          {otherItems.map((r) => (
             <ReviewItem key={r.id} review={r} contentId={contentId} />
           ))}
         </div>

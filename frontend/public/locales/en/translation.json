@@ -144,6 +144,42 @@
     "deleteAccount": "Delete my account",
     "deleteConfirm": "Are you sure you want to permanently delete your account and all data?"
   },
+  "reviews": {
+    "title": "Reviews",
+    "sortLabel": "Sort:",
+    "sortNewest": "Newest",
+    "sortPopular": "Popular",
+    "loginPrompt": "<0>Sign in</0> to write a review.",
+    "loading": "Loading…",
+    "empty": "No reviews yet. Be the first to write one!",
+    "yours": "Your review",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "spoilerHidden": "⚠ Contains spoiler — tap to show",
+    "flagged": "flagged",
+    "like": "Like",
+    "form": {
+      "writeTitle": "Write a review",
+      "editTitle": "Update your review",
+      "bodyPlaceholder": "What did you think about this?",
+      "spoiler": "Contains spoilers",
+      "selectRating": "Please pick a rating",
+      "saveFailed": "Couldn't save",
+      "updateFailed": "Couldn't update",
+      "deleteConfirm": "Delete your review?",
+      "delete": "Delete",
+      "saving": "Saving…",
+      "update": "Update",
+      "publish": "Publish"
+    },
+    "comments": {
+      "empty": "No comments yet.",
+      "placeholder": "Add a comment…",
+      "send": "Send",
+      "loginPrompt": "Sign in to comment.",
+      "delete": "Delete"
+    }
+  },
   "footer": {
     "tagline": "The social diary of cinema"
   },

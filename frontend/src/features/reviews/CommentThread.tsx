@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { reviewsApi } from '@/api/reviews.api';
 import { useAuthStore } from '@/features/auth/authStore';
 import type { ReviewComment } from '@/types/review';
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function CommentThread({ reviewId }: Props) {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const me = useAuthStore((s) => s.user);
   const [text, setText] = useState('');
@@ -45,7 +47,7 @@ export function CommentThread({ reviewId }: Props) {
   return (
     <div className="mt-4 space-y-3 border-t border-white/5 pt-4">
       {comments.length === 0 ? (
-        <p className="text-xs text-ink-muted">Henüz yorum yok.</p>
+        <p className="text-xs text-ink-muted">{t('reviews.comments.empty')}</p>
       ) : (
         <ul className="space-y-3">
           {comments.map((c: ReviewComment) => (
@@ -67,7 +69,7 @@ export function CommentThread({ reviewId }: Props) {
                       onClick={() => remove.mutate(c.id)}
                       className="ml-auto text-ink-muted hover:text-rating-low"
                     >
-                      Sil
+                      {t('reviews.comments.delete')}
                     </button>
                   )}
                 </div>
@@ -84,7 +86,7 @@ export function CommentThread({ reviewId }: Props) {
             type="text"
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Yorum ekle…"
+            placeholder={t('reviews.comments.placeholder')}
             maxLength={2000}
             className="flex-1 rounded-lg border border-white/10 bg-surface-raised px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-accent focus:outline-none"
             disabled={add.isPending}
@@ -94,11 +96,11 @@ export function CommentThread({ reviewId }: Props) {
             disabled={add.isPending || text.trim().length === 0}
             className="btn-outline text-xs"
           >
-            Gönder
+            {t('reviews.comments.send')}
           </button>
         </form>
       ) : (
-        <p className="text-xs text-ink-muted">Yorum yazmak için giriş yap.</p>
+        <p className="text-xs text-ink-muted">{t('reviews.comments.loginPrompt')}</p>
       )}
     </div>
   );

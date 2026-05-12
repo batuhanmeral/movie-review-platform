@@ -144,6 +144,42 @@
     "deleteAccount": "Hesabımı sil",
     "deleteConfirm": "Hesabını ve tüm verilerini kalıcı olarak silmek istediğine emin misin?"
   },
+  "reviews": {
+    "title": "İncelemeler",
+    "sortLabel": "Sırala:",
+    "sortNewest": "Yeni",
+    "sortPopular": "Popüler",
+    "loginPrompt": "İnceleme yazmak için <0>giriş yap</0>.",
+    "loading": "Yükleniyor…",
+    "empty": "Henüz inceleme yok. İlk yazan sen ol!",
+    "yours": "Senin incelemen",
+    "edit": "Düzenle",
+    "cancel": "İptal",
+    "spoilerHidden": "⚠ Spoiler içeriyor — göstermek için tıkla",
+    "flagged": "işaretlendi",
+    "like": "Beğen",
+    "form": {
+      "writeTitle": "İnceleme yaz",
+      "editTitle": "İncelemeni güncelle",
+      "bodyPlaceholder": "Bu içerik hakkında ne düşünüyorsun?",
+      "spoiler": "Spoiler içeriyor",
+      "selectRating": "Lütfen bir puan seçin",
+      "saveFailed": "Kaydedilemedi",
+      "updateFailed": "Güncellenemedi",
+      "deleteConfirm": "İncelemeni silmek istediğine emin misin?",
+      "delete": "Sil",
+      "saving": "Kaydediliyor…",
+      "update": "Güncelle",
+      "publish": "Yayınla"
+    },
+    "comments": {
+      "empty": "Henüz yorum yok.",
+      "placeholder": "Yorum ekle…",
+      "send": "Gönder",
+      "loginPrompt": "Yorum yazmak için giriş yap.",
+      "delete": "Sil"
+    }
+  },
   "footer": {
     "tagline": "Sinemanın sosyal günlüğü"
   },
