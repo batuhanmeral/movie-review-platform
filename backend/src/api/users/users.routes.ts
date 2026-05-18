@@ -1,4 +1,5 @@
 import { Router, type RequestHandler } from 'express';
+
 import { prisma } from '../../config/db.js';
 import { requireAuth } from '../../middleware/auth.middleware.js';
 import { validate } from '../../middleware/validate.middleware.js';
@@ -12,6 +13,7 @@ import {
 import { changePasswordSchema, updateMeSchema } from './users.validator.js';
 
 export const usersRouter = Router();
+
 
 const meSelect = {
   id: true,
@@ -56,6 +58,7 @@ const updateMe: RequestHandler = async (req, res, next) => {
     next(err);
   }
 };
+
 
 // Şifre değiştirme: mevcut şifreyi doğrular ve yeniyi kaydeder
 const changePassword: RequestHandler = async (req, res, next) => {
@@ -119,6 +122,7 @@ const getByUsername: RequestHandler = async (req, res, next) => {
 
 usersRouter.get('/me', requireAuth, getMe);
 usersRouter.patch('/me', requireAuth, validate(updateMeSchema), updateMe);
+
 usersRouter.post(
   '/me/password',
   requireAuth,
@@ -127,3 +131,4 @@ usersRouter.post(
 );
 usersRouter.delete('/me', requireAuth, deleteMe);
 usersRouter.get('/:username', getByUsername);
+

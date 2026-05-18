@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
+// 404 Sayfa Bulunamadı bileşeni
+// Eşleşmeyen rotalar için gösterilir, ana sayfaya dönüş bağlantısı içerir
 export default function NotFoundPage() {
   const { t } = useTranslation();
   return (

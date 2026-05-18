@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { apiClient } from '@/api/client';
 import { useAuthStore } from '@/features/auth/authStore';
 
+// Herkese açık kullanıcı profil verisi arayüzü
 interface PublicProfile {
   id: string;
   username: string;
@@ -16,12 +17,16 @@ interface PublicProfile {
   _count: { reviews: number; followers: number; following: number };
 }
 
+// Kullanıcı profil sayfası bileşeni
+// URL'deki username parametresine göre kullanıcı bilgilerini getirir ve gösterir
+// Avatar, bio, konum, istatistikler ve düzenleme/takip butonları içerir
 export default function ProfilePage() {
   const { username = '' } = useParams();
   const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const bioMaxLength = 160;
 
+  // Kullanıcı profilini API'den getir
   const { data, isLoading, isError } = useQuery({
     queryKey: ['profile', username],
     queryFn: async () => {
@@ -31,6 +36,7 @@ export default function ProfilePage() {
     enabled: Boolean(username),
   });
 
+  // Yükleme durumu iskeleti
   if (isLoading) {
     return (
       <div className="card animate-pulse">
@@ -41,6 +47,7 @@ export default function ProfilePage() {
     );
   }
 
+  // Hata veya profil bulunamadı durumu
   if (isError || !data) {
     return <div className="card text-center text-ink-muted">{t('profile.notFound')}</div>;
   }
@@ -48,48 +55,40 @@ export default function ProfilePage() {
   const initial = (data.displayName ?? data.username).charAt(0).toUpperCase();
   const isOwnProfile = Boolean(user && user.username === data.username);
   const watchedCount = data.watchedCount ?? 0;
+  // Bio metnini belirli uzunlukta kes
   const bioText = (data.bio ?? '').trim();
   const bioDisplay =
     bioText.length > bioMaxLength ? `${bioText.slice(0, bioMaxLength)}…` : bioText;
 
   return (
     <div className="space-y-6">
+      {/* Profil başlık kartı */}
       <header className="card relative overflow-hidden">
+        {/* Dekoratif arka plan gradient'i */}
         <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-br from-accent/30 via-accent-cyan/20 to-transparent blur-2xl" />
         <div className="relative flex flex-col gap-6 lg:flex-row lg:items-start">
+          {/* Sol bölüm: Avatar, isim, konum */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center lg:w-[34%] lg:pr-6">
+            {/* Avatar */}
             <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-accent to-accent-cyan text-3xl font-bold text-surface ring-4 ring-surface">
               {data.avatarUrl ? (
-                <img
-                  src={data.avatarUrl}
-                  alt=""
-                  className="h-full w-full rounded-full object-cover"
-                />
+                <img src={data.avatarUrl} alt="" className="h-full w-full rounded-full object-cover" />
               ) : (
                 initial
               )}
             </div>
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-3">
-                <h1 className="font-display text-2xl font-bold text-ink">
-                  {data.displayName ?? data.username}
-                </h1>
+                <h1 className="font-display text-2xl font-bold text-ink">{data.displayName ?? data.username}</h1>
+                {/* Kendi profilinse düzenle, değilse takip et butonu */}
                 {isOwnProfile ? (
-                  <Link to="/settings" className="btn-outline px-3 py-1 text-xs">
-                    {t('profile.editProfile')}
-                  </Link>
+                  <Link to="/settings" className="btn-outline px-3 py-1 text-xs">{t('profile.editProfile')}</Link>
                 ) : (
-                  <button
-                    type="button"
-                    disabled
-                    title={t('profile.followComingSoon')}
-                    className="btn-outline px-3 py-1 text-xs"
-                  >
-                    {t('profile.follow')}
-                  </button>
+                  <button type="button" disabled title={t('profile.followComingSoon')} className="btn-outline px-3 py-1 text-xs">{t('profile.follow')}</button>
                 )}
               </div>
               <p className="text-sm text-ink-muted">@{data.username}</p>
+              {/* Konum bilgisi */}
               {data.location && (
                 <p className="mt-1 flex items-center gap-1 text-xs text-ink-muted">
                   <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -100,11 +99,13 @@ export default function ProfilePage() {
               )}
             </div>
           </div>
+          {/* Orta bölüm: Biyografi */}
           {bioDisplay && (
             <div className="lg:flex-1 lg:self-stretch lg:border-l lg:border-white/10 lg:pl-6">
               <p className="max-w-prose text-sm text-ink">{bioDisplay}</p>
             </div>
           )}
+          {/* Sağ bölüm: İstatistikler */}
           <div className="lg:w-[30%] lg:self-stretch lg:border-l lg:border-white/10 lg:pl-6">
             <div className="grid grid-cols-2 gap-3 text-center">
               <Stat label={t('profile.watched')} value={watchedCount} />
@@ -116,11 +117,13 @@ export default function ProfilePage() {
         </div>
       </header>
 
+      {/* İçerik alanı yer tutucusu */}
       <div className="card text-sm text-ink-muted">{t('profile.empty')}</div>
     </div>
   );
 }
 
+// İstatistik göstergesi bileşeni (izlenen, inceleme, takipçi, takip sayıları)
 function Stat({ label, value }: { label: string; value: number }) {
   return (
     <div>

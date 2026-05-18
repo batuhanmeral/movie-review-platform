@@ -6,9 +6,12 @@ import { useAuthStore } from '@/features/auth/authStore';
 import { usersApi } from '@/api/users.api';
 import type { Language } from '@/types/auth';
 
+// Veritabanı dil kodu ↔ i18n dil kodu eşleştirmeleri
 const LANG_TO_I18N: Record<Language, 'tr' | 'en'> = { TR: 'tr', EN: 'en' };
 const I18N_TO_LANG: Record<'tr' | 'en', Language> = { tr: 'TR', en: 'EN' };
 
+// API hata yanıtından okunabilir hata mesajı çıkarır
+// Doğrulama hataları varsa alan bazlı mesajları birleştirir
 function extractError(err: unknown, fallback: string): string {
   if (err instanceof AxiosError && err.response?.data) {
     const data = err.response.data as {
@@ -25,6 +28,8 @@ function extractError(err: unknown, fallback: string): string {
   return fallback;
 }
 
+// Ayarlar sayfası ana bileşeni
+// Profil düzenleme, şifre değiştirme, dil seçimi ve hesap silme bölümlerini içerir
 export default function SettingsPage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -34,13 +39,17 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6">
+      {/* Sayfa başlığı */}
       <header>
         <h1 className="font-display text-2xl font-bold text-ink">{t('settings.title')}</h1>
         <p className="mt-1 text-sm text-ink-muted">{t('settings.subtitle')}</p>
       </header>
 
+      {/* Profil bilgileri düzenleme kartı */}
       <ProfileCard />
+      {/* Şifre değiştirme kartı */}
       <PasswordCard />
+      {/* Dil tercihi kartı */}
       <LanguageCard
         current={i18n.resolvedLanguage as 'tr' | 'en' | undefined}
         persisted={user ? LANG_TO_I18N[user.language] : undefined}
@@ -50,11 +59,13 @@ export default function SettingsPage() {
           try {
             await updateProfile({ language: I18N_TO_LANG[code] });
           } catch (err) {
+            // Kaydetme başarısız olursa önceki dile geri dön
             if (previous) await i18n.changeLanguage(previous);
             throw err;
           }
         }}
       />
+      {/* Tehlikeli bölge: hesap silme */}
       <DangerCard
         onDeleted={() => {
           clearAuth();
@@ -64,6 +75,7 @@ export default function SettingsPage() {
     </div>
   );
 
+  // Profil bilgileri düzenleme kartı iç bileşeni
   function ProfileCard() {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -93,78 +105,35 @@ export default function SettingsPage() {
           }}
         >
           <div className="grid gap-4 sm:grid-cols-2">
+            {/* E-posta alanı */}
             <div>
-              <label className="label" htmlFor="email">
-                {t('auth.email')}
-              </label>
-              <input
-                className="input"
-                id="email"
-                name="email"
-                type="email"
-                defaultValue={user?.email ?? ''}
-              />
+              <label className="label" htmlFor="email">{t('auth.email')}</label>
+              <input className="input" id="email" name="email" type="email" defaultValue={user?.email ?? ''} />
             </div>
+            {/* Kullanıcı adı alanı */}
             <div>
-              <label className="label" htmlFor="username">
-                {t('auth.username')}
-              </label>
-              <input
-                className="input"
-                id="username"
-                name="username"
-                defaultValue={user?.username ?? ''}
-              />
+              <label className="label" htmlFor="username">{t('auth.username')}</label>
+              <input className="input" id="username" name="username" defaultValue={user?.username ?? ''} />
             </div>
+            {/* Görünen ad alanı */}
             <div>
-              <label className="label" htmlFor="displayName">
-                {t('auth.displayName')}
-              </label>
-              <input
-                className="input"
-                id="displayName"
-                name="displayName"
-                defaultValue={user?.displayName ?? ''}
-              />
+              <label className="label" htmlFor="displayName">{t('auth.displayName')}</label>
+              <input className="input" id="displayName" name="displayName" defaultValue={user?.displayName ?? ''} />
             </div>
+            {/* Konum alanı */}
             <div>
-              <label className="label" htmlFor="location">
-                {t('settings.location')}
-              </label>
-              <input
-                className="input"
-                id="location"
-                name="location"
-                placeholder={t('settings.locationPlaceholder')}
-                defaultValue={user?.location ?? ''}
-                maxLength={100}
-              />
+              <label className="label" htmlFor="location">{t('settings.location')}</label>
+              <input className="input" id="location" name="location" placeholder={t('settings.locationPlaceholder')} defaultValue={user?.location ?? ''} maxLength={100} />
             </div>
+            {/* Avatar URL alanı */}
             <div className="sm:col-span-2">
-              <label className="label" htmlFor="avatarUrl">
-                {t('settings.avatarUrl')}
-              </label>
-              <input
-                className="input"
-                id="avatarUrl"
-                name="avatarUrl"
-                type="url"
-                placeholder="https://…"
-                defaultValue={user?.avatarUrl ?? ''}
-              />
+              <label className="label" htmlFor="avatarUrl">{t('settings.avatarUrl')}</label>
+              <input className="input" id="avatarUrl" name="avatarUrl" type="url" placeholder="https://…" defaultValue={user?.avatarUrl ?? ''} />
             </div>
+            {/* Biyografi alanı */}
             <div className="sm:col-span-2">
-              <label className="label" htmlFor="bio">
-                {t('settings.bio')}
-              </label>
-              <textarea
-                className="input min-h-[88px] resize-y"
-                id="bio"
-                name="bio"
-                maxLength={280}
-                placeholder={t('settings.bioPlaceholder')}
-                defaultValue={user?.bio ?? ''}
-              />
+              <label className="label" htmlFor="bio">{t('settings.bio')}</label>
+              <textarea className="input min-h-[88px] resize-y" id="bio" name="bio" maxLength={280} placeholder={t('settings.bioPlaceholder')} defaultValue={user?.bio ?? ''} />
             </div>
           </div>
 
@@ -179,6 +148,7 @@ export default function SettingsPage() {
     );
   }
 
+  // Şifre değiştirme kartı iç bileşeni
   function PasswordCard() {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -196,6 +166,7 @@ export default function SettingsPage() {
             setSuccess(null);
             const form = e.currentTarget;
             const data = Object.fromEntries(new FormData(form).entries()) as Record<string, string>;
+            // Yeni şifre ve onay eşleşmesini kontrol et
             if (data.newPassword !== data.confirmPassword) {
               setError(t('settings.passwordMismatch'));
               return;
@@ -216,47 +187,21 @@ export default function SettingsPage() {
             }
           }}
         >
+          {/* Mevcut şifre */}
           <div>
-            <label className="label" htmlFor="currentPassword">
-              {t('settings.currentPassword')}
-            </label>
-            <input
-              className="input"
-              id="currentPassword"
-              name="currentPassword"
-              type="password"
-              autoComplete="current-password"
-              required
-            />
+            <label className="label" htmlFor="currentPassword">{t('settings.currentPassword')}</label>
+            <input className="input" id="currentPassword" name="currentPassword" type="password" autoComplete="current-password" required />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
+            {/* Yeni şifre */}
             <div>
-              <label className="label" htmlFor="newPassword">
-                {t('settings.newPassword')}
-              </label>
-              <input
-                className="input"
-                id="newPassword"
-                name="newPassword"
-                type="password"
-                autoComplete="new-password"
-                minLength={8}
-                required
-              />
+              <label className="label" htmlFor="newPassword">{t('settings.newPassword')}</label>
+              <input className="input" id="newPassword" name="newPassword" type="password" autoComplete="new-password" minLength={8} required />
             </div>
+            {/* Yeni şifre onayı */}
             <div>
-              <label className="label" htmlFor="confirmPassword">
-                {t('settings.confirmPassword')}
-              </label>
-              <input
-                className="input"
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                minLength={8}
-                required
-              />
+              <label className="label" htmlFor="confirmPassword">{t('settings.confirmPassword')}</label>
+              <input className="input" id="confirmPassword" name="confirmPassword" type="password" autoComplete="new-password" minLength={8} required />
             </div>
           </div>
 
@@ -272,12 +217,14 @@ export default function SettingsPage() {
   }
 }
 
+// Dil tercihi kartı bileşeni
 interface LanguageCardProps {
-  current: 'tr' | 'en' | undefined;
-  persisted: 'tr' | 'en' | undefined;
+  current: 'tr' | 'en' | undefined;   // Şu anki aktif dil
+  persisted: 'tr' | 'en' | undefined; // Sunucuda kayıtlı dil
   onChange: (code: 'tr' | 'en') => Promise<void>;
 }
 
+// Dil değiştirme kartı - TR/EN butonlarıyla dil tercihi yönetimi
 function LanguageCard({ current, persisted, onChange }: LanguageCardProps) {
   const { t } = useTranslation();
   const [saving, setSaving] = useState(false);
@@ -310,6 +257,7 @@ function LanguageCard({ current, persisted, onChange }: LanguageCardProps) {
               className={active ? 'btn-primary' : 'btn-outline'}
             >
               {code.toUpperCase()}
+              {/* Sunucuda kayıtlı dili işaretle */}
               {isPersisted && (
                 <span className="ml-1 text-[10px] font-bold uppercase text-accent">●</span>
               )}
@@ -323,6 +271,7 @@ function LanguageCard({ current, persisted, onChange }: LanguageCardProps) {
   );
 }
 
+// Tehlikeli bölge kartı - hesap silme işlevi
 function DangerCard({ onDeleted }: { onDeleted: () => void }) {
   const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
@@ -333,6 +282,7 @@ function DangerCard({ onDeleted }: { onDeleted: () => void }) {
       <h2 className="text-base font-semibold text-rating-low">{t('settings.dangerZone')}</h2>
       <p className="mt-1 text-sm text-ink-muted">{t('settings.deleteHelp')}</p>
       {error && <p className="form-error mt-2">{error}</p>}
+      {/* Hesap silme butonu - onay penceresi gösterir */}
       <button
         type="button"
         disabled={busy}

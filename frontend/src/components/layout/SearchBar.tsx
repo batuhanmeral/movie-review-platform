@@ -7,8 +7,12 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { poster } from '@/lib/tmdb';
 import type { ContentItem } from '@/types/content';
 
+// Arama önerisi gösterebilmek için minimum karakter sayısı
 const MIN_CHARS = 2;
 
+// Navbar'daki arama çubuğu bileşeni
+// Yazıldıkça (debounced) öneri listesi gösterir
+// Form gönderildiğinde keşfet sayfasına yönlendirir
 export function SearchBar() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -18,13 +22,16 @@ export function SearchBar() {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLFormElement>(null);
 
+  // URL'deki q parametresi değişirse arama değerini güncelle
   useEffect(() => {
     setValue(params.get('q') ?? '');
   }, [params]);
 
+  // Arama değerini 250ms geciktir (gereksiz API çağrılarını önle)
   const debounced = useDebounce(value.trim(), 250);
   const enabled = debounced.length >= MIN_CHARS;
 
+  // Arama önerileri için API sorgusu
   const { data, isFetching } = useQuery({
     queryKey: ['searchSuggest', debounced, language],
     queryFn: () => contentApi.search(debounced, 'multi', language, 1),
@@ -32,7 +39,7 @@ export function SearchBar() {
     staleTime: 30 * 1000,
   });
 
-  // Sadece film/dizi, popülerliğe göre sırala
+  // Sadece film/dizi sonuçlarını al, popülerliğe göre sırala ve ilk 8'ini göster
   const items = (data?.results ?? [])
     .filter((r) => r.type === 'movie' || r.type === 'tv')
     .sort((a, b) => b.popularity - a.popularity)
@@ -47,6 +54,7 @@ export function SearchBar() {
     return () => document.removeEventListener('mousedown', onClick);
   }, []);
 
+  // Form gönderildiğinde keşfet sayfasına yönlendir
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const q = value.trim();
@@ -59,6 +67,7 @@ export function SearchBar() {
 
   return (
     <form ref={wrapRef} role="search" onSubmit={onSubmit} className="relative w-56 md:w-64">
+      {/* Arama ikonu */}
       <svg
         aria-hidden="true"
         className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted"
@@ -73,6 +82,7 @@ export function SearchBar() {
           d="m21 21-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"
         />
       </svg>
+      {/* Arama giriş alanı */}
       <input
         type="search"
         value={value}
@@ -87,6 +97,7 @@ export function SearchBar() {
                    placeholder:text-ink-muted focus:ring-2 focus:ring-accent/60"
       />
 
+      {/* Arama önerileri dropdown'ı */}
       {showDropdown && (
         <div className="absolute left-0 right-0 top-full z-40 mt-2 overflow-hidden rounded-xl bg-surface-raised shadow-card ring-1 ring-white/10">
           {isFetching && items.length === 0 ? (
@@ -100,6 +111,7 @@ export function SearchBar() {
                   <SuggestRow item={it} onPick={() => setOpen(false)} />
                 </li>
               ))}
+              {/* "Tüm sonuçları gör" bağlantısı */}
               <li>
                 <button
                   type="submit"
@@ -116,6 +128,7 @@ export function SearchBar() {
   );
 }
 
+// Arama önerisi satırı - poster küçük görseli, başlık, tür ve yıl bilgisi gösterir
 function SuggestRow({ item, onPick }: { item: ContentItem; onPick: () => void }) {
   const { t } = useTranslation();
   const posterUrl = poster(item.posterPath, 'w92');
@@ -127,6 +140,7 @@ function SuggestRow({ item, onPick }: { item: ContentItem; onPick: () => void })
       onClick={onPick}
       className="flex items-center gap-3 px-3 py-2 hover:bg-surface-muted"
     >
+      {/* Poster küçük görseli veya yer tutucu */}
       {posterUrl ? (
         <img
           src={posterUrl}

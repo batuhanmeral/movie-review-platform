@@ -1,17 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
 
+// Bileşen prop tanımları
 interface Props {
   children: React.ReactNode;
   ariaLabel?: string;
 }
 
-// Yatay kaydırılabilir bir konteyner; sağ/sol oklarla içeriği görünür alanın
-// %85'i kadar kaydırır. Ok düğmeleri sınırlara ulaşıldığında pasifleşir.
+// Yatay kaydırılabilir bir konteyner bileşeni
+// Sağ/sol ok butonlarıyla içeriği görünür alanın %85'i kadar kaydırır
+// Ok düğmeleri sınırlara ulaşıldığında otomatik olarak gizlenir
 export function Slider({ children, ariaLabel }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(false);
 
+  // Kaydırma durumuna göre ok butonlarının görünürlüğünü güncelle
   const updateButtons = () => {
     const el = scrollRef.current;
     if (!el) return;
@@ -19,6 +22,7 @@ export function Slider({ children, ariaLabel }: Props) {
     setCanNext(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
   };
 
+  // Scroll ve resize olaylarını dinleyerek buton durumlarını güncelle
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -32,6 +36,7 @@ export function Slider({ children, ariaLabel }: Props) {
     };
   }, []);
 
+  // Belirtilen yöne doğru görünür alanın %85'i kadar yumuşak kaydırma yap
   const scrollBy = (direction: 'left' | 'right') => {
     const el = scrollRef.current;
     if (!el) return;
@@ -41,6 +46,7 @@ export function Slider({ children, ariaLabel }: Props) {
 
   return (
     <div className="relative">
+      {/* Sola kaydırma butonu - başlangıçta gizli, kaydırılabiliyorsa görünür */}
       <button
         type="button"
         onClick={() => scrollBy('left')}
@@ -50,6 +56,7 @@ export function Slider({ children, ariaLabel }: Props) {
       >
         ←
       </button>
+      {/* Sağa kaydırma butonu */}
       <button
         type="button"
         onClick={() => scrollBy('right')}
@@ -60,6 +67,7 @@ export function Slider({ children, ariaLabel }: Props) {
         →
       </button>
 
+      {/* Kaydırılabilir içerik alanı - yatay scroll, snap desteği */}
       <div
         ref={scrollRef}
         aria-label={ariaLabel}

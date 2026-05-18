@@ -1,6 +1,8 @@
+// PostCSS yapılandırma dosyası
+// Tailwind CSS ve Autoprefixer eklentilerini tanımlar
 module.exports = {
   plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
+    tailwindcss: {},   // Tailwind CSS işleme
+    autoprefixer: {},  // Tarayıcı uyumluluk ön ekleri
   },
 };

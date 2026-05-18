@@ -1,7 +1,8 @@
 import type { ReviewCardData } from '@/components/review/ReviewCard';
 
-// Phase 3'te gerçek inceleme akışıyla değiştirilecek; şimdilik
+// İleride gerçek inceleme akışıyla değiştirilecek; şimdilik
 // ana sayfanın "Arkadaşlarından Son İncelemeler" bölümünü dolduruyor.
+// Bu mock veriler geliştirme aşamasında UI'ı test etmek için kullanılır
 
 export const recentReviews: ReviewCardData[] = [
   {

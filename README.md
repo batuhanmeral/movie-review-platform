@@ -1,19 +1,29 @@
 # SineFiles
 
-> Sosyal Film/Dizi İnceleme Platformu — TMDB destekli, tam yığın sinema topluluğu.
+> Sosyal Film/Dizi İnceleme Platformu - TMDB destekli, tam yığın sinema topluluğu.
+
+## Nedir?
+
+SineFiles, kullanıcıların film ve dizileri keşfettiği, puanladığı, inceleme yazdığı
+ve koleksiyon listeleri oluşturduğu Letterboxd benzeri bir sosyal sinema platformudur.
 
 ## Teknoloji Yığını
-- **Backend:** Node.js, Express, TypeScript, Prisma (PostgreSQL)
-- **Frontend:** React 18, Vite, TypeScript, Tailwind CSS, React Query
-- **Cache & Veri:** Redis, TMDB API
-- **Güvenlik:** JWT, bcrypt, Helmet, Zod, rate limiting
 
-## Monorepo Yapısı
+| Katman | Teknoloji |
+|--------|-----------|
+| **Backend** | Node.js, Express, TypeScript, Prisma (PostgreSQL), Redis |
+| **Frontend** | React 18, Vite, TypeScript, Tailwind CSS, React Query, Zustand |
+| **Auth** | JWT (access + refresh), bcrypt, rate limiting |
+| **Veri** | TMDB API (Redis cache), Zod doğrulama |
+| **i18n** | i18next (TR/EN) |
+
+## Proje Yapısı
+
 ```
 SineFiles/
-├── backend/         # Express API + Prisma
-├── frontend/        # Vite + React SPA
-├── docker-compose.yml
+├── backend/             # Express REST API + Prisma ORM
+├── frontend/            # Vite + React SPA
+├── docker-compose.yml   # PostgreSQL + Redis
 └── README.md
 ```
 
@@ -24,31 +34,27 @@ SineFiles/
 - pnpm 9+
 - Docker & Docker Compose
 
-### 2. Veritabanı ve Redis'i ayağa kaldır
+### 2. Veritabanı ve Redis'i başlat
 ```bash
 docker compose up -d
 ```
-- PostgreSQL: `localhost:5432`
-- Redis: `localhost:6379`
 
 ### 3. Backend
 ```bash
 cd backend
-cp .env.example .env
+cp .env.example .env      # TMDB_API_KEY ve JWT secret'ları doldur
 pnpm install
 pnpm prisma migrate dev --name init
-pnpm dev
+pnpm dev                  # http://localhost:4000
 ```
-API: <http://localhost:4000>
 
 ### 4. Frontend
 ```bash
 cd frontend
 cp .env.example .env
 pnpm install
-pnpm dev
+pnpm dev                  # http://localhost:5173
 ```
-Web: <http://localhost:5173>
 
 ## Komutlar
 
@@ -58,7 +64,7 @@ Web: <http://localhost:5173>
 | `pnpm dev` | Geliştirme sunucusu (tsx watch) |
 | `pnpm build` | TypeScript derleme |
 | `pnpm start` | Üretim çalıştırma |
-| `pnpm prisma:studio` | Prisma Studio |
+| `pnpm prisma:studio` | Prisma Studio (veritabanı görüntüleyici) |
 
 ### Frontend
 | Komut | Açıklama |

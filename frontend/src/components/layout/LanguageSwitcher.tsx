@@ -1,10 +1,14 @@
 import { useTranslation } from 'react-i18next';
 
+// Desteklenen dil seçenekleri
 const LANGS = [
   { code: 'tr', label: 'TR' },
   { code: 'en', label: 'EN' },
 ] as const;
 
+// Navbar'daki dil değiştirme bileşeni
+// Radyo buton grubu olarak TR/EN arasında geçiş sağlar
+// Sadece küçük ekranların üstünde (sm+) görünür
 export function LanguageSwitcher() {
   const { i18n } = useTranslation();
   return (

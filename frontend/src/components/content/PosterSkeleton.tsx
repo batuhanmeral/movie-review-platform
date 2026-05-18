@@ -1,7 +1,10 @@
 interface Props {
-  count?: number;
+  count?: number; // Oluşturulacak iskelet sayısı
 }
 
+// Poster yükleme iskeleti (skeleton) bileşeni
+// İçerikler yüklenirken gösterilen animasyonlu yer tutucu
+// Poster kartıyla aynı boyut oranına (2:3) sahiptir
 export function PosterSkeleton({ count = 1 }: Props) {
   return (
     <>
