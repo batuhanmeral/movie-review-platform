@@ -217,6 +217,61 @@
       "delete": "Sil"
     }
   },
+  "feed": {
+    "title": "Akış",
+    "subtitle": "Topluluğun son film incelemeleri.",
+    "loading": "Yükleniyor…",
+    "empty": "Bu zaman aralığında henüz gönderi yok.",
+    "error": "Akış yüklenemedi. Birazdan tekrar dene.",
+    "readMore": "Devamını Gör",
+    "readLess": "Daha Az",
+    "spoilerReveal": "Spoiler İçerir — Görmek için Tıkla",
+    "like": "Beğen",
+    "comment": "Yorum yap",
+    "share": "Paylaş",
+    "menu": "Daha fazla",
+    "viewProfile": "Profili gör",
+    "goToFilm": "Filme git",
+    "copyLink": "Bağlantıyı Kopyala",
+    "copied": "Bağlantı kopyalandı ✓",
+    "repost": "Platformda Paylaş",
+    "reposted": "Akışında paylaşıldı ✓",
+    "report": "Bildir",
+    "reported": "Bildirildi ✓",
+    "window": {
+      "week": "Hafta",
+      "month": "Ay",
+      "all": "Tümü"
+    },
+    "comingSoon": "Yakında",
+    "filters": {
+      "title": "Filtrele",
+      "source": "Kaynak",
+      "sort": "Sırala",
+      "time": "Zaman"
+    },
+    "source": {
+      "popular": "Popüler",
+      "following": "Takip Ettiklerin"
+    },
+    "sort": {
+      "relevant": "Öne Çıkanlar",
+      "newest": "En Yeni",
+      "mostLiked": "En Beğenilen",
+      "mostCommented": "En Çok Yorumlanan"
+    },
+    "community": {
+      "title": "Topluluktan",
+      "subtitle": "Akışta aktif sinefiller",
+      "reviewCount_one": "{{count}} inceleme",
+      "reviewCount_other": "{{count}} inceleme"
+    },
+    "stats": {
+      "reviews": "İnceleme",
+      "cinephiles": "Sinefil",
+      "avg": "Ort. Puan"
+    }
+  },
   "footer": {
     "tagline": "Sinemanın sosyal günlüğü"
   },

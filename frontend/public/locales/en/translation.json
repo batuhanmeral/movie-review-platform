@@ -217,6 +217,61 @@
       "delete": "Delete"
     }
   },
+  "feed": {
+    "title": "Feed",
+    "subtitle": "The latest film reviews from the community.",
+    "loading": "Loading…",
+    "empty": "No posts in this time range yet.",
+    "error": "Couldn't load the feed. Try again shortly.",
+    "readMore": "Read more",
+    "readLess": "Show less",
+    "spoilerReveal": "Contains spoilers — tap to reveal",
+    "like": "Like",
+    "comment": "Comment",
+    "share": "Share",
+    "menu": "More",
+    "viewProfile": "View profile",
+    "goToFilm": "Go to film",
+    "copyLink": "Copy link",
+    "copied": "Link copied ✓",
+    "repost": "Share on platform",
+    "reposted": "Shared to your feed ✓",
+    "report": "Report",
+    "reported": "Reported ✓",
+    "window": {
+      "week": "Week",
+      "month": "Month",
+      "all": "All"
+    },
+    "comingSoon": "Soon",
+    "filters": {
+      "title": "Filter",
+      "source": "Source",
+      "sort": "Sort",
+      "time": "Time"
+    },
+    "source": {
+      "popular": "Popular",
+      "following": "Following"
+    },
+    "sort": {
+      "relevant": "Top",
+      "newest": "Newest",
+      "mostLiked": "Most liked",
+      "mostCommented": "Most discussed"
+    },
+    "community": {
+      "title": "From the community",
+      "subtitle": "Active cinephiles in the feed",
+      "reviewCount_one": "{{count}} review",
+      "reviewCount_other": "{{count}} reviews"
+    },
+    "stats": {
+      "reviews": "Reviews",
+      "cinephiles": "Cinephiles",
+      "avg": "Avg. rating"
+    }
+  },
   "footer": {
     "tagline": "The social diary of cinema"
   },

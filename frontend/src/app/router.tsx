@@ -6,6 +6,7 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 // Lazy loading ile sayfa bileşenlerini dinamik olarak içe aktar
 // Bu, ilk yükleme boyutunu küçültür ve performansı artırır
 const HomePage = lazy(() => import('@/pages/Home/HomePage'));
+const FeedPage = lazy(() => import('@/pages/Feed/FeedPage'));
 const DiscoverPage = lazy(() => import('@/pages/Discover/DiscoverPage'));
 const ContentDetailPage = lazy(() => import('@/pages/ContentDetail/ContentDetailPage'));
 const LoginPage = lazy(() => import('@/pages/Auth/LoginPage'));
@@ -31,6 +32,8 @@ export function AppRouter() {
         <Route element={<RootLayout />}>
           {/* Ana sayfa */}
           <Route path="/" element={<HomePage />} />
+          {/* Sosyal akış (feed) - inceleme gönderilerinin akışı */}
+          <Route path="/feed" element={<FeedPage />} />
           {/* Keşfet sayfası - film/dizi arama ve filtreleme */}
           <Route path="/discover" element={<DiscoverPage />} />
           {/* Film detay sayfası - TMDB ID ile eşleşir */}
