@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -57,7 +58,9 @@ export function FollowListModal({ username, kind, onClose }: FollowListModalProp
 
   const title = kind === 'followers' ? t('profile.followers') : t('profile.following');
 
-  return (
+  // Portal ile doğrudan body'ye render edilir; böylece navbar'ın stacking
+  // context'inden bağımsız olarak tüm sayfanın (navbar dahil) üzerini kaplar.
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
@@ -135,6 +138,7 @@ export function FollowListModal({ username, kind, onClose }: FollowListModalProp
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
