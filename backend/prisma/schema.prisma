@@ -70,6 +70,13 @@ model User {
   role         Role     @default(USER)
   isSuspended  Boolean  @default(false)
   emailVerified Boolean @default(false)
+
+  // Profilde öne çıkarılan favoriler (TMDB referansları; metaveri TMDB'den zenginleştirilir)
+  // favoriteContent: en fazla 4 öğe, her biri { tmdbId: number, type: "movie" | "tv" }
+  favoriteContent   Json?
+  favoriteActorId    Int?  // TMDB person id (oyuncu)
+  favoriteDirectorId Int?  // TMDB person id (yönetmen)
+
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

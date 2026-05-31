@@ -130,6 +130,20 @@
     "showing_one": "Showing {{count}} title",
     "showing_other": "Showing {{count}} titles"
   },
+  "favorites": {
+    "title": "Favorites",
+    "content": "Favorite Titles",
+    "people": "Favorite Artists",
+    "actor": "Favorite actor",
+    "director": "Favorite director",
+    "empty": "No favorites added yet.",
+    "editTitle": "Favorites",
+    "editHelp": "Pick up to 4 titles plus a favorite actor and director to feature on your profile.",
+    "searchContent": "Search films or series…",
+    "searchPerson": "Search people…",
+    "remove": "Remove",
+    "save": "Save Favorites"
+  },
   "settings": {
     "title": "Settings",
     "subtitle": "Manage your account and app preferences.",

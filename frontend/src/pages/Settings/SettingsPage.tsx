@@ -5,6 +5,7 @@ import { AxiosError } from 'axios';
 import { useAuthStore } from '@/features/auth/authStore';
 import { usersApi } from '@/api/users.api';
 import type { Language } from '@/types/auth';
+import { FavoritesCard } from './FavoritesCard';
 
 // Veritabanı dil kodu ↔ i18n dil kodu eşleştirmeleri
 const LANG_TO_I18N: Record<Language, 'tr' | 'en'> = { TR: 'tr', EN: 'en' };
@@ -47,6 +48,8 @@ export default function SettingsPage() {
 
       {/* Profil bilgileri düzenleme kartı */}
       <ProfileCard />
+      {/* Favori içerik, oyuncu ve yönetmen seçimi */}
+      <FavoritesCard />
       {/* Şifre değiştirme kartı */}
       <PasswordCard />
       {/* Dil tercihi kartı */}

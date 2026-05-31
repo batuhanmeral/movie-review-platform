@@ -9,6 +9,7 @@ import {
   genresSchema,
   personParamsSchema,
   personQuerySchema,
+  personSearchSchema,
   popularSchema,
   searchSchema,
   trendingSchema,
@@ -98,6 +99,21 @@ const genresHandler: RequestHandler = async (req, res, next) => {
   }
 };
 
+// İsme göre kişi (oyuncu/yönetmen) araması yapar — favori seçiminde kullanılır
+const personSearchHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const { q, page, language } = req.query as unknown as {
+      q: string;
+      page: number;
+      language: tmdb.Lang;
+    };
+    const data = await tmdb.searchPerson(q, page, language);
+    res.json(data);
+  } catch (err) {
+    next(err);
+  }
+};
+
 // Bir kişinin (oyuncu) profilini ve oynadığı yapımları getirir
 const personHandler: RequestHandler = async (req, res, next) => {
   try {
@@ -128,8 +144,9 @@ contentRouter.get('/popular', validate(popularSchema, 'query'), popularHandler);
 contentRouter.get('/upcoming', validate(upcomingSchema, 'query'), upcomingHandler);
 contentRouter.get('/discover', validate(discoverSchema, 'query'), discoverHandler);
 contentRouter.get('/genres', validate(genresSchema, 'query'), genresHandler);
-// Not: bu rota /:type/:tmdbId'den ÖNCE tanımlanmalı, aksi halde "person" bir tür
-// (type) olarak yakalanır.
+// Not: bu rotalar /:type/:tmdbId'den ÖNCE tanımlanmalı, aksi halde "person" bir tür
+// (type) olarak yakalanır. Ayrıca /person/search, /person/:personId'den önce gelmeli.
+contentRouter.get('/person/search', validate(personSearchSchema, 'query'), personSearchHandler);
 contentRouter.get(
   '/person/:personId',
   validate(personParamsSchema, 'params'),

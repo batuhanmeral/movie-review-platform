@@ -304,6 +304,45 @@ export async function detail(type: TmdbType, id: number, language: Lang): Promis
   });
 }
 
+// Kişi (oyuncu/yönetmen) arama sonucundaki tek bir öğe
+export interface TmdbPersonResult {
+  id: number;
+  name: string;
+  profilePath: string | null;
+  knownForDepartment: string | null;
+}
+
+interface RawPersonSearchResponse {
+  results?: {
+    id: number;
+    name: string;
+    profile_path: string | null;
+    known_for_department?: string | null;
+    popularity?: number;
+  }[];
+}
+
+// İsme göre kişi (oyuncu/yönetmen) araması yapar. Favori oyuncu/yönetmen
+// seçiminde kullanılır; popülerliğe göre sıralı ilk sonuçları döndürür.
+export async function searchPerson(query: string, page: number, language: Lang) {
+  return cached(`tmdb:searchPerson:${language}:${page}:${query}`, TTL, async () => {
+    const raw = await tmdbFetch<RawPersonSearchResponse>('/search/person', {
+      query,
+      page,
+      language,
+      include_adult: 'false',
+    });
+    return (raw.results ?? [])
+      .filter((r) => r.id)
+      .map<TmdbPersonResult>((r) => ({
+        id: r.id,
+        name: r.name,
+        profilePath: r.profile_path,
+        knownForDepartment: r.known_for_department ?? null,
+      }));
+  });
+}
+
 // Bir kişinin (oyuncu) profil bilgilerini ve oynadığı tüm film/dizileri getirir.
 // combined_credits tek istekte tüm yapımları döndürür; sayfalama yoktur, bu yüzden
 // filtreleme/sıralama ön yüzde (client-side) yapılır. Aynı yapımda birden fazla

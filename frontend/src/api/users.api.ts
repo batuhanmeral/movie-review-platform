@@ -1,5 +1,6 @@
 import { apiClient } from './client';
-import type { AuthUser, Language } from '@/types/auth';
+import type { AuthUser, FavoriteContentRef, Language } from '@/types/auth';
+import type { Lang, UserFavorites } from '@/types/content';
 
 // Profil güncelleme için girdi alanları
 export interface UpdateMeInput {
@@ -10,6 +11,10 @@ export interface UpdateMeInput {
   language?: Language;
   email?: string;
   username?: string;
+  // Favoriler: favoriteContent en fazla 4 öğe; id'ler null gönderilerek temizlenebilir
+  favoriteContent?: FavoriteContentRef[];
+  favoriteActorId?: number | null;
+  favoriteDirectorId?: number | null;
 }
 
 // Şifre değiştirme için girdi alanları
@@ -42,5 +47,13 @@ export const usersApi = {
   // Kullanıcı hesabını kalıcı olarak siler
   deleteMe: async (): Promise<void> => {
     await apiClient.delete('/users/me');
+  },
+
+  // Bir kullanıcının favorilerini (TMDB ile zenginleştirilmiş) getirir
+  favorites: async (username: string, language: Lang): Promise<UserFavorites> => {
+    const { data } = await apiClient.get<UserFavorites>(`/users/${username}/favorites`, {
+      params: { language },
+    });
+    return data;
   },
 };

@@ -3,6 +3,12 @@ export type Language = 'TR' | 'EN';
 // Kullanıcı yetki rolü
 export type Role = 'USER' | 'ADMIN';
 
+// Profilde öne çıkarılan favori içerik referansı (TMDB)
+export interface FavoriteContentRef {
+  tmdbId: number;
+  type: 'movie' | 'tv';
+}
+
 // Oturum açmış kullanıcının profil bilgileri
 export interface AuthUser {
   id: string;
@@ -14,6 +20,9 @@ export interface AuthUser {
   location: string | null;     // Konum bilgisi
   language: Language;           // Tercih edilen dil
   role: Role;                   // Kullanıcı rolü (USER veya ADMIN)
+  favoriteContent: FavoriteContentRef[] | null;  // Favori içerikler (en fazla 4)
+  favoriteActorId: number | null;                // Favori oyuncu (TMDB person id)
+  favoriteDirectorId: number | null;             // Favori yönetmen (TMDB person id)
   createdAt: string;            // Hesap oluşturulma tarihi
 }
 

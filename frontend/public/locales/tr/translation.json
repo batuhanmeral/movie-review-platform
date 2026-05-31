@@ -130,6 +130,20 @@
     "showing_one": "{{count}} yapım gösteriliyor",
     "showing_other": "{{count}} yapım gösteriliyor"
   },
+  "favorites": {
+    "title": "Favoriler",
+    "content": "Favori Yapımlar",
+    "people": "Favori Sanatçılar",
+    "actor": "Favori oyuncu",
+    "director": "Favori yönetmen",
+    "empty": "Henüz favori eklenmemiş.",
+    "editTitle": "Favoriler",
+    "editHelp": "Profilinde öne çıkacak en fazla 4 yapımı, favori oyuncunu ve yönetmenini seç.",
+    "searchContent": "Film veya dizi ara…",
+    "searchPerson": "Kişi ara…",
+    "remove": "Kaldır",
+    "save": "Favorileri Kaydet"
+  },
   "settings": {
     "title": "Ayarlar",
     "subtitle": "Hesap ve uygulama tercihlerini yönet.",

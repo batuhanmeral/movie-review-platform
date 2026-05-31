@@ -14,6 +14,12 @@ const optionalUrl = z
   .transform((v) => (v === '' ? undefined : v))
   .refine((v) => v === undefined || /^https?:\/\//i.test(v), 'Geçerli bir URL girin');
 
+// Favori içerik öğesi: TMDB referansı (tmdbId + tür)
+const favoriteContentItem = z.object({
+  tmdbId: z.number().int().positive(),
+  type: z.enum(['movie', 'tv']),
+});
+
 // Profil bilgilerini güncelleme şeması. Tüm alanlar opsiyoneldir; şifre burada yok.
 export const updateMeSchema = z.object({
   displayName: optionalText(64),
@@ -28,6 +34,11 @@ export const updateMeSchema = z.object({
     .max(24)
     .regex(/^[a-z0-9_]+$/, 'Kullanıcı adı sadece küçük harf, rakam ve _ içerebilir')
     .optional(),
+  // Profilde öne çıkarılan favoriler (en fazla 4 içerik; oyuncu/yönetmen TMDB id'si).
+  // null göndermek ilgili favoriyi temizler.
+  favoriteContent: z.array(favoriteContentItem).max(4).optional(),
+  favoriteActorId: z.number().int().positive().nullable().optional(),
+  favoriteDirectorId: z.number().int().positive().nullable().optional(),
 });
 
 // Şifre değiştirme: mevcut şifre + yeni şifre + yeni şifre tekrarı

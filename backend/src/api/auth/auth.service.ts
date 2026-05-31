@@ -41,6 +41,9 @@ export interface PublicUser {
   location: string | null;
   language: 'TR' | 'EN';
   role: 'USER' | 'ADMIN';
+  favoriteContent: unknown;
+  favoriteActorId: number | null;
+  favoriteDirectorId: number | null;
   createdAt: Date;
 }
 
@@ -56,6 +59,9 @@ function toPublic(user: User): PublicUser {
     location: user.location,
     language: user.language,
     role: user.role,
+    favoriteContent: user.favoriteContent,
+    favoriteActorId: user.favoriteActorId,
+    favoriteDirectorId: user.favoriteDirectorId,
     createdAt: user.createdAt,
   };
 }

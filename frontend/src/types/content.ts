@@ -56,6 +56,14 @@ export interface PersonCredit extends ContentItem {
   character: string;
 }
 
+// Kişi (oyuncu/yönetmen) arama sonucundaki tek bir öğe
+export interface PersonSearchResult {
+  id: number;
+  name: string;
+  profilePath: string | null;
+  knownForDepartment: string | null;
+}
+
 // Oyuncu (kişi) profili: kişisel bilgiler + filmografi
 export interface Person {
   id: number;
@@ -66,6 +74,30 @@ export interface Person {
   birthday: string | null;
   placeOfBirth: string | null;
   credits: PersonCredit[];
+}
+
+// Profildeki favori içerik kartı (TMDB'den zenginleştirilmiş)
+export interface FavoriteContentCard {
+  tmdbId: number;
+  type: TmdbType;
+  title: string;
+  posterPath: string | null;
+  releaseDate: string | null;
+  voteAverage: number;
+}
+
+// Profildeki favori kişi (oyuncu/yönetmen) kartı
+export interface FavoritePersonCard {
+  id: number;
+  name: string;
+  profilePath: string | null;
+}
+
+// /users/:username/favorites yanıtı
+export interface UserFavorites {
+  content: FavoriteContentCard[];
+  actor: FavoritePersonCard | null;
+  director: FavoritePersonCard | null;
 }
 
 // İçeriğin detaylı bilgilerini içeren genişletilmiş arayüz

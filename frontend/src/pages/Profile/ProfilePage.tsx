@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { apiClient } from '@/api/client';
 import { useAuthStore } from '@/features/auth/authStore';
+import { FavoritesSection } from './FavoritesSection';
 
 // Herkese açık kullanıcı profil verisi arayüzü
 interface PublicProfile {
@@ -117,8 +118,8 @@ export default function ProfilePage() {
         </div>
       </header>
 
-      {/* İçerik alanı yer tutucusu */}
-      <div className="card text-sm text-ink-muted">{t('profile.empty')}</div>
+      {/* Favoriler: öne çıkan içerikler, oyuncu ve yönetmen */}
+      <FavoritesSection username={data.username} />
     </div>
   );
 }
