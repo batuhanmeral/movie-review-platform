@@ -3,6 +3,7 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ContentCard } from '@/components/content/ContentCard';
+import { PersonCard } from '@/components/content/PersonCard';
 import { PosterSkeleton } from '@/components/content/PosterSkeleton';
 import { contentApi, langFromI18n } from '@/api/content.api';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -56,6 +57,15 @@ export default function DiscoverPage() {
     getNextPageParam: (last) => (last.page < last.totalPages ? last.page + 1 : undefined),
   });
 
+  // Arama modunda kişi (oyuncu/yönetmen) sonuçlarını da getir
+  const peopleQuery = useQuery({
+    queryKey: ['searchPeople', debouncedQuery, language],
+    queryFn: () => contentApi.searchPerson(debouncedQuery, language, 1),
+    enabled: isSearching,
+    staleTime: 30 * 1000,
+  });
+  const people = peopleQuery.data ?? [];
+
   // Tüm sayfaların sonuçlarını tek bir diziye düzleştir
   const items = useMemo(() => list.data?.pages.flatMap((p) => p.results) ?? [], [list.data]);
 
@@ -76,6 +86,23 @@ export default function DiscoverPage() {
             </p>
           </div>
         </header>
+
+        {/* Kişi sonuçları (yalnızca arama modunda) */}
+        {isSearching && people.length > 0 && (
+          <section className="space-y-3">
+            <h2 className="font-display text-lg font-bold text-ink">{t('discover.people')}</h2>
+            <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-8">
+              {people.map((p) => (
+                <PersonCard key={p.id} person={p} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* İçerik (yapım) sonuçları başlığı — arama modunda kişilerden ayırmak için */}
+        {isSearching && people.length > 0 && (
+          <h2 className="font-display text-lg font-bold text-ink">{t('discover.titles')}</h2>
+        )}
 
         {/* İçerik kartları grid'i */}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">

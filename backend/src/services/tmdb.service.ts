@@ -333,7 +333,11 @@ export async function searchPerson(query: string, page: number, language: Lang) 
       include_adult: 'false',
     });
     return (raw.results ?? [])
-      .filter((r) => r.id)
+      // Geçersiz ve alakasız kayıtları ele: id'si olmayanları ve hem fotoğrafı
+      // olmayan hem de popülerliği yok denecek kadar düşük (çöp) sonuçları çıkar.
+      .filter((r) => r.id && (r.profile_path !== null || (r.popularity ?? 0) >= 1))
+      // En alakalı/tanınan kişi en üstte olsun diye popülerliğe göre azalan sırala.
+      .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))
       .map<TmdbPersonResult>((r) => ({
         id: r.id,
         name: r.name,
