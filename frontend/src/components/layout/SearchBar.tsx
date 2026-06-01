@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { contentApi, langFromI18n } from '@/api/content.api';
 import { useDebounce } from '@/hooks/useDebounce';
-import { poster, profile } from '@/lib/tmdb';
+import { departmentLabel, poster, profile } from '@/lib/tmdb';
 import type { ContentItem, PersonSearchResult } from '@/types/content';
 
 // Arama önerisi gösterebilmek için minimum karakter sayısı
@@ -234,7 +234,9 @@ function ContentRow({ item, onPick }: { item: ContentItem; onPick: () => void })
 
 // Kişi öneri satırı - profil küçük görseli, isim ve bilinen alan; oyuncu sayfasına link
 function PersonRow({ person, onPick }: { person: PersonSearchResult; onPick: () => void }) {
+  const { t } = useTranslation();
   const photoUrl = profile(person.profilePath, 'w45');
+  const department = departmentLabel(person.knownForDepartment, t);
 
   return (
     <Link
@@ -247,8 +249,8 @@ function PersonRow({ person, onPick }: { person: PersonSearchResult; onPick: () 
       </div>
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-ink">{person.name}</p>
-        {person.knownForDepartment && (
-          <p className="truncate text-xs text-ink-muted">{person.knownForDepartment}</p>
+        {department && (
+          <p className="truncate text-xs text-ink-muted">{department}</p>
         )}
       </div>
     </Link>

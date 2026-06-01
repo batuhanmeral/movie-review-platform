@@ -1,12 +1,15 @@
 import { Link } from 'react-router-dom';
-import { profile } from '@/lib/tmdb';
+import { useTranslation } from 'react-i18next';
+import { departmentLabel, profile } from '@/lib/tmdb';
 import type { PersonSearchResult } from '@/types/content';
 
 // Kişi (oyuncu/yönetmen) arama sonucu kartı — keşfet sayfası grid'inde kullanılır.
 // Profil fotoğrafı + isim + bilinen alan gösterir; oyuncu sayfasına yönlendirir.
 export function PersonCard({ person }: { person: PersonSearchResult }) {
+  const { t } = useTranslation();
   const photoUrl = profile(person.profilePath, 'w185');
   const initial = person.name.charAt(0).toUpperCase();
+  const department = departmentLabel(person.knownForDepartment, t);
 
   return (
     <Link to={`/person/${person.id}`} className="group block" aria-label={person.name}>
@@ -25,8 +28,8 @@ export function PersonCard({ person }: { person: PersonSearchResult }) {
         )}
       </div>
       <p className="mt-1.5 truncate text-sm font-semibold text-ink">{person.name}</p>
-      {person.knownForDepartment && (
-        <p className="truncate text-xs text-ink-muted">{person.knownForDepartment}</p>
+      {department && (
+        <p className="truncate text-xs text-ink-muted">{department}</p>
       )}
     </Link>
   );

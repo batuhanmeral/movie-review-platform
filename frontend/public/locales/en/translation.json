@@ -133,7 +133,22 @@
     "creditCount_one": "{{count}} title",
     "creditCount_other": "{{count}} titles",
     "showing_one": "Showing {{count}} title",
-    "showing_other": "Showing {{count}} titles"
+    "showing_other": "Showing {{count}} titles",
+    "departments": {
+      "Acting": "Acting",
+      "Directing": "Directing",
+      "Writing": "Writing",
+      "Production": "Production",
+      "Sound": "Sound",
+      "Camera": "Camera",
+      "Editing": "Editing",
+      "Art": "Art",
+      "Costume & Make-Up": "Costume & Make-Up",
+      "Visual Effects": "Visual Effects",
+      "Lighting": "Lighting",
+      "Crew": "Crew",
+      "Creator": "Creator"
+    }
   },
   "favorites": {
     "title": "Favorites",

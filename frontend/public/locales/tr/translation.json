@@ -133,7 +133,22 @@
     "creditCount_one": "{{count}} yapım",
     "creditCount_other": "{{count}} yapım",
     "showing_one": "{{count}} yapım gösteriliyor",
-    "showing_other": "{{count}} yapım gösteriliyor"
+    "showing_other": "{{count}} yapım gösteriliyor",
+    "departments": {
+      "Acting": "Oyunculuk",
+      "Directing": "Yönetmenlik",
+      "Writing": "Senaryo",
+      "Production": "Yapım",
+      "Sound": "Ses",
+      "Camera": "Kamera",
+      "Editing": "Kurgu",
+      "Art": "Sanat",
+      "Costume & Make-Up": "Kostüm & Makyaj",
+      "Visual Effects": "Görsel Efektler",
+      "Lighting": "Işık",
+      "Crew": "Ekip",
+      "Creator": "Yaratıcı"
+    }
   },
   "favorites": {
     "title": "Favoriler",

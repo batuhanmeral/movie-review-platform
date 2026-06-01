@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { ContentCard } from '@/components/content/ContentCard';
 import { PosterSkeleton } from '@/components/content/PosterSkeleton';
 import { contentApi, langFromI18n } from '@/api/content.api';
-import { profile } from '@/lib/tmdb';
+import { departmentLabel, profile } from '@/lib/tmdb';
 import type { Genre, PersonCredit } from '@/types/content';
 import { PersonFilterPanel, type PersonFilterValues } from './PersonFilterPanel';
 
@@ -146,7 +146,10 @@ export default function PersonPage() {
           {/* Künye: etiketli detay satırları, alt alta */}
           <dl className="space-y-2 text-sm">
             {data.knownForDepartment && (
-              <DetailRow label={t('person.knownFor')} value={data.knownForDepartment} />
+              <DetailRow
+                label={t('person.knownFor')}
+                value={departmentLabel(data.knownForDepartment, t) ?? data.knownForDepartment}
+              />
             )}
             {birthday && <DetailRow label={t('person.born')} value={birthday} />}
             {data.placeOfBirth && <DetailRow label={t('person.placeOfBirth')} value={data.placeOfBirth} />}
