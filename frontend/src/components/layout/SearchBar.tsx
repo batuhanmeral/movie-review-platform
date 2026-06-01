@@ -3,9 +3,11 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { contentApi, langFromI18n } from '@/api/content.api';
+import { usersApi } from '@/api/users.api';
 import { useDebounce } from '@/hooks/useDebounce';
 import { departmentLabel, poster, profile } from '@/lib/tmdb';
 import type { ContentItem, PersonSearchResult } from '@/types/content';
+import type { UserSearchResult } from '@/types/auth';
 
 // Arama önerisi gösterebilmek için minimum karakter sayısı
 const MIN_CHARS = 2;
@@ -55,6 +57,14 @@ export function SearchBar() {
     staleTime: 30 * 1000,
   });
 
+  // Kullanıcı (platform üyeleri) önerileri
+  const usersQuery = useQuery({
+    queryKey: ['searchSuggest', 'user', debounced],
+    queryFn: () => usersApi.search(debounced),
+    enabled,
+    staleTime: 30 * 1000,
+  });
+
   // Sadece film/dizi sonuçlarını al; posteri olmayan çöp kayıtları (TMDB'nin kişi
   // adıyla oluşturduğu sahte "dizi" girişleri vb.) ele, popülerliğe göre sırala ve
   // ilk 6'sını göster.
@@ -66,8 +76,11 @@ export function SearchBar() {
   // Posteri olan kişileri öne al, ilk 4'ünü göster
   const people = (peopleQuery.data ?? []).slice(0, 4);
 
-  const isFetching = contentQuery.isFetching || peopleQuery.isFetching;
-  const hasResults = items.length > 0 || people.length > 0;
+  // Kullanıcı sonuçlarının ilk 4'ünü göster
+  const users = (usersQuery.data ?? []).slice(0, 4);
+
+  const isFetching = contentQuery.isFetching || peopleQuery.isFetching || usersQuery.isFetching;
+  const hasResults = items.length > 0 || people.length > 0 || users.length > 0;
 
   // Dış tıklamada dropdown'ı kapat; arama boşsa çubuğu da daralt
   useEffect(() => {
@@ -188,6 +201,22 @@ export function SearchBar() {
                 </>
               )}
 
+              {/* Kullanıcı sonuçları */}
+              {users.length > 0 && (
+                <>
+                  <p className="border-t border-white/5 px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-ink-dim">
+                    {t('nav.sectionUsers')}
+                  </p>
+                  <ul>
+                    {users.map((u) => (
+                      <li key={u.id}>
+                        <UserRow user={u} onPick={() => setOpen(false)} />
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+
               {/* "Tüm sonuçları gör" bağlantısı */}
               <button
                 type="button"
@@ -252,6 +281,31 @@ function PersonRow({ person, onPick }: { person: PersonSearchResult; onPick: () 
         {department && (
           <p className="truncate text-xs text-ink-muted">{department}</p>
         )}
+      </div>
+    </Link>
+  );
+}
+
+// Kullanıcı öneri satırı - avatar, görünen ad ve @kullanıcı adı; profil sayfasına link
+function UserRow({ user, onPick }: { user: UserSearchResult; onPick: () => void }) {
+  const initial = (user.displayName ?? user.username).charAt(0).toUpperCase();
+
+  return (
+    <Link
+      to={`/u/${user.username}`}
+      onClick={onPick}
+      className="flex items-center gap-3 px-3 py-2 hover:bg-surface-muted"
+    >
+      <div className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full bg-surface-muted text-sm font-bold text-ink-muted ring-1 ring-white/10">
+        {user.avatarUrl ? (
+          <img src={user.avatarUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+        ) : (
+          initial
+        )}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold text-ink">{user.displayName ?? user.username}</p>
+        <p className="truncate text-xs text-ink-muted">@{user.username}</p>
       </div>
     </Link>
   );

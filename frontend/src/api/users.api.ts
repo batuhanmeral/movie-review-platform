@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { AuthUser, FavoriteContentRef, Language } from '@/types/auth';
+import type { AuthUser, FavoriteContentRef, Language, UserSearchResult } from '@/types/auth';
 import type { Lang, UserFavorites } from '@/types/content';
 import type { PopularReview } from './reviews.api';
 
@@ -62,6 +62,14 @@ export const usersApi = {
   reviews: async (username: string, limit = 20): Promise<PopularReview[]> => {
     const { data } = await apiClient.get<PopularReview[]>(`/users/${username}/reviews`, {
       params: { limit },
+    });
+    return data;
+  },
+
+  // İsme/kullanıcı adına göre kullanıcı arar (arama çubuğu önerileri için)
+  search: async (q: string): Promise<UserSearchResult[]> => {
+    const { data } = await apiClient.get<UserSearchResult[]>('/users/search', {
+      params: { q },
     });
     return data;
   },
