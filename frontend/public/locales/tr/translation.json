@@ -266,6 +266,8 @@
     "subtitle": "Topluluğun son film incelemeleri.",
     "loading": "Yükleniyor…",
     "empty": "Bu zaman aralığında henüz gönderi yok.",
+    "emptyFollowing": "Henüz kimseyi takip etmiyorsun ya da takip ettiklerin bu aralıkta inceleme yazmamış.",
+    "loginForFollowing": "Takip akışı için giriş yap.",
     "error": "Akış yüklenemedi. Birazdan tekrar dene.",
     "readMore": "Devamını Gör",
     "readLess": "Daha Az",
@@ -287,7 +289,6 @@
       "month": "Ay",
       "all": "Tümü"
     },
-    "comingSoon": "Yakında",
     "filters": {
       "title": "Filtrele",
       "source": "Kaynak",
@@ -304,16 +305,9 @@
       "mostLiked": "En Beğenilen",
       "mostCommented": "En Çok Yorumlanan"
     },
-    "community": {
-      "title": "Topluluktan",
-      "subtitle": "Akışta aktif sinefiller",
-      "reviewCount_one": "{{count}} inceleme",
-      "reviewCount_other": "{{count}} inceleme"
-    },
-    "stats": {
-      "reviews": "İnceleme",
-      "cinephiles": "Sinefil",
-      "avg": "Ort. Puan"
+    "friends": {
+      "title": "Takip Ettiklerim",
+      "subtitle": "Takip ettiğin kişiler"
     }
   },
   "footer": {

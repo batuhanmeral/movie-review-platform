@@ -33,6 +33,14 @@ export const reviewsApi = {
     return data;
   },
 
+  // Takip edilen kullanıcıların incelemeleri (akış "Takip Ettiklerin" kaynağı)
+  following: async (windowDays = 7, limit = 10): Promise<PopularReview[]> => {
+    const { data } = await apiClient.get<PopularReview[]>('/reviews/following', {
+      params: { windowDays, limit },
+    });
+    return data;
+  },
+
   listForContent: async (
     contentId: string,
     sort: ReviewSort = 'newest',

@@ -266,6 +266,8 @@
     "subtitle": "The latest film reviews from the community.",
     "loading": "Loading…",
     "empty": "No posts in this time range yet.",
+    "emptyFollowing": "You're not following anyone yet, or those you follow haven't reviewed anything in this range.",
+    "loginForFollowing": "Sign in to see your following feed.",
     "error": "Couldn't load the feed. Try again shortly.",
     "readMore": "Read more",
     "readLess": "Show less",
@@ -287,7 +289,6 @@
       "month": "Month",
       "all": "All"
     },
-    "comingSoon": "Soon",
     "filters": {
       "title": "Filter",
       "source": "Source",
@@ -304,16 +305,9 @@
       "mostLiked": "Most liked",
       "mostCommented": "Most discussed"
     },
-    "community": {
-      "title": "From the community",
-      "subtitle": "Active cinephiles in the feed",
-      "reviewCount_one": "{{count}} review",
-      "reviewCount_other": "{{count}} reviews"
-    },
-    "stats": {
-      "reviews": "Reviews",
-      "cinephiles": "Cinephiles",
-      "avg": "Avg. rating"
+    "friends": {
+      "title": "Following",
+      "subtitle": "People you follow"
     }
   },
   "footer": {

@@ -47,6 +47,27 @@ const getMe: RequestHandler = async (req, res, next) => {
   }
 };
 
+// Oturum açmış kullanıcının takip ettiği kullanıcıları (arkadaşlarını) listeler.
+// Akış sayfasındaki "Arkadaşlarım" bölümünde kullanılır.
+const getMyFollowing: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.auth) throw new UnauthorizedError();
+    const rows = await prisma.follow.findMany({
+      where: { followerId: req.auth.sub },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+      select: {
+        following: {
+          select: { id: true, username: true, displayName: true, avatarUrl: true },
+        },
+      },
+    });
+    res.json(rows.map((r) => r.following));
+  } catch (err) {
+    next(err);
+  }
+};
+
 // Oturum açmış kullanıcının kendi profil bilgilerini günceller (şifre hariç)
 const updateMe: RequestHandler = async (req, res, next) => {
   try {
@@ -391,6 +412,7 @@ const searchUsers: RequestHandler = async (req, res, next) => {
 };
 
 usersRouter.get('/me', requireAuth, getMe);
+usersRouter.get('/me/following', requireAuth, getMyFollowing);
 usersRouter.patch('/me', requireAuth, validate(updateMeSchema), updateMe);
 
 usersRouter.post(

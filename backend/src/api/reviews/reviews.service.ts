@@ -22,6 +22,16 @@ const reviewInclude = {
   _count: { select: { likes: true, comments: true } },
 } as const;
 
+// Akış/profil listelerinde inceleme kartının ihtiyaç duyduğu içerik alanları
+const reviewContentSelect = {
+  id: true,
+  tmdbId: true,
+  type: true,
+  title: true,
+  posterPath: true,
+  releaseDate: true,
+} as const;
+
 type ReviewRow = Prisma.ReviewGetPayload<{ include: typeof reviewInclude }>;
 
 function shape(r: ReviewRow, likedByMe: boolean) {
@@ -155,19 +165,39 @@ export async function listPopularReviews(
     where: { createdAt: { gte: since }, body: { not: null } },
     orderBy: [{ likes: { _count: 'desc' } }, { createdAt: 'desc' }],
     take: limit,
-    include: {
-      ...reviewInclude,
-      content: {
-        select: {
-          id: true,
-          tmdbId: true,
-          type: true,
-          title: true,
-          posterPath: true,
-          releaseDate: true,
-        },
-      },
-    },
+    include: { ...reviewInclude, content: { select: reviewContentSelect } },
+  });
+
+  const likedSet = await annotateLiked(rows, viewerId);
+
+  return rows.map((r) => ({
+    ...shape(r, likedSet.has(r.id)),
+    content: r.content,
+  }));
+}
+
+// Akış "Takip Ettiklerin" kaynağı: viewer'ın takip ettiği kullanıcıların belirli zaman
+// aralığındaki incelemelerini, Popüler ile aynı şekil ve etkileşim temelli sıralamayla
+// (en çok beğenilen, eşitlikte en yeni) listeler. Takip edilen yoksa boş döner.
+export async function listFollowingReviews(
+  viewerId: string,
+  windowDays: number,
+  limit: number,
+) {
+  const following = await prisma.follow.findMany({
+    where: { followerId: viewerId },
+    select: { followingId: true },
+  });
+  const followingIds = following.map((f) => f.followingId);
+  if (followingIds.length === 0) return [];
+
+  const since = new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000);
+
+  const rows = await prisma.review.findMany({
+    where: { userId: { in: followingIds }, createdAt: { gte: since }, body: { not: null } },
+    orderBy: [{ likes: { _count: 'desc' } }, { createdAt: 'desc' }],
+    take: limit,
+    include: { ...reviewInclude, content: { select: reviewContentSelect } },
   });
 
   const likedSet = await annotateLiked(rows, viewerId);

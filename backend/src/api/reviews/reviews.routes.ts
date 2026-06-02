@@ -7,6 +7,7 @@ import {
   deleteCommentHandler,
   deleteReviewHandler,
   listCommentsHandler,
+  followingReviewsHandler,
   listContentReviewsHandler,
   myReviewHandler,
   popularReviewsHandler,
@@ -27,6 +28,9 @@ export const reviewsRouter = Router();
 
 // Popüler incelemeler (zaman penceresine göre)
 reviewsRouter.get('/popular', optionalAuth, popularReviewsHandler);
+
+// Takip edilen kullanıcıların incelemeleri (akış "Takip Ettiklerin" kaynağı)
+reviewsRouter.get('/following', requireAuth, followingReviewsHandler);
 
 // Yeni inceleme oluşturma
 reviewsRouter.post('/', requireAuth, validate(createReviewSchema), createReviewHandler);

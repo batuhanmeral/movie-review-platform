@@ -21,12 +21,14 @@ export interface FeedFilterState {
   setSort: (s: FeedSortKey) => void;
   windowKey: FeedWindowKey;
   setWindowKey: (w: FeedWindowKey) => void;
+  // Viewer giriş yaptıysa "Takip Ettiklerin" kaynağı seçilebilir
+  canFollow: boolean;
 }
 
 // Sol kenar rayı: kaynak + sıralama + zaman filtreleri (lg+ ekranlarda).
 export function FeedFilters(props: FeedFilterState) {
   const { t } = useTranslation();
-  const { source, setSource, sort, setSort, windowKey, setWindowKey } = props;
+  const { source, setSource, sort, setSort, windowKey, setWindowKey, canFollow } = props;
 
   return (
     <div className="card space-y-5">
@@ -41,14 +43,17 @@ export function FeedFilters(props: FeedFilterState) {
           <OptionRow active={source === 'popular'} onClick={() => setSource('popular')}>
             {t('feed.source.popular')}
           </OptionRow>
-          {/* Takip özelliği Faz 5'te gelecek — şimdilik devre dışı */}
+          {/* Takip akışı yalnızca giriş yapan kullanıcılar için */}
           <OptionRow
-            disabled
-            badge={<Badge>{t('feed.comingSoon')}</Badge>}
+            active={source === 'following'}
+            disabled={!canFollow}
             onClick={() => setSource('following')}
           >
             {t('feed.source.following')}
           </OptionRow>
+          {!canFollow && (
+            <p className="px-3 pt-0.5 text-[11px] text-ink-dim">{t('feed.loginForFollowing')}</p>
+          )}
         </div>
       </Section>
 
@@ -172,14 +177,6 @@ function WindowSegmented({
         </button>
       ))}
     </div>
-  );
-}
-
-function Badge({ children }: { children: ReactNode }) {
-  return (
-    <span className="shrink-0 rounded-full bg-surface-muted px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-ink-dim">
-      {children}
-    </span>
   );
 }
 

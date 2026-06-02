@@ -60,6 +60,20 @@ export const popularReviewsHandler: RequestHandler = async (req, res, next) => {
   }
 };
 
+// Akış "Takip Ettiklerin" kaynağı — giriş yapmış kullanıcının takip ettiklerinin
+// incelemelerini döndürür. Viewer kimliği şart olduğundan requireAuth ile korunur.
+export const followingReviewsHandler: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.auth) throw new UnauthorizedError();
+    const windowDays = Number(req.query.windowDays ?? 7);
+    const limit = Math.min(Number(req.query.limit ?? 10), 50);
+    const result = await service.listFollowingReviews(req.auth.sub, windowDays, limit);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const myReviewHandler: RequestHandler = async (req, res, next) => {
   try {
     if (!req.auth) throw new UnauthorizedError();
