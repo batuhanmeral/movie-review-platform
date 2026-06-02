@@ -34,6 +34,7 @@ export interface TmdbDetail extends TmdbItem {
   genres: { id: number; name: string }[];
   cast: { id: number; name: string; character: string; profilePath: string | null }[];
   videos: { key: string; site: string; type: string; name: string }[];
+  recommendations: TmdbItem[];
   lastAirDate?: string | null;
   status?: string;
   inProduction?: boolean;
@@ -74,6 +75,9 @@ interface RawDetailResponse extends RawItem {
   };
   videos?: {
     results?: { key: string; site: string; type: string; name: string }[];
+  };
+  recommendations?: {
+    results?: RawItem[];
   };
   last_air_date?: string | null;
   status?: string;
@@ -278,7 +282,7 @@ export async function detail(type: TmdbType, id: number, language: Lang): Promis
   return cached(`tmdb:detail:${type}:${id}:${language}`, TTL, async () => {
     const raw = await tmdbFetch<RawDetailResponse>(`/${type}/${id}`, {
       language,
-      append_to_response: 'credits,videos',
+      append_to_response: 'credits,videos,recommendations',
     });
     const base = normalize(raw, type);
     const runtime = type === 'movie' ? (raw.runtime ?? null) : (raw.episode_run_time?.[0] ?? null);
@@ -300,6 +304,11 @@ export async function detail(type: TmdbType, id: number, language: Lang): Promis
         .filter((v) => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser'))
         .slice(0, 3)
         .map((v) => ({ key: v.key, site: v.site, type: v.type, name: v.name })),
+      // Benzer/önerilen içerikler (posteri olanlar, ilk 12)
+      recommendations: (raw.recommendations?.results ?? [])
+        .filter((r) => r.id && r.poster_path)
+        .slice(0, 12)
+        .map((r) => normalize(r, type)),
     };
   });
 }

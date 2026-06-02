@@ -108,6 +108,7 @@ export interface ContentDetail extends ContentItem {
   genres: Genre[];                  // Tür listesi
   cast: CastMember[];               // Oyuncu kadrosu
   videos: VideoMeta[];               // Fragmanlar ve videolar
+  recommendations?: ContentItem[];   // Benzer/önerilen içerikler (eski cache'te olmayabilir)
   contentId: string;                 // Sistemdeki içerik ID'si
   communityRating: number | null;    // SineFiles topluluk puanı
   communityReviewCount: number;      // Topluluk inceleme sayısı

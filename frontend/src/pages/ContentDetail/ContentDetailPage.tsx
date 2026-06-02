@@ -5,6 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { contentApi, langFromI18n } from '@/api/content.api';
 import { backdrop, poster, profile, youtubeEmbed, youtubeThumb } from '@/lib/tmdb';
 import { RatingStars } from '@/components/content/RatingStars';
+import { ContentCard } from '@/components/content/ContentCard';
+import { Slider } from '@/components/layout/Slider';
 import { ReviewsSection } from '@/features/reviews/ReviewsSection';
 import type { TmdbType } from '@/types/content';
 
@@ -199,6 +201,20 @@ export default function ContentDetailPage({ type }: ContentDetailPageProps) {
               </button>
             ))}
           </div>
+        </section>
+      )}
+
+      {/* Benzer / önerilen içerikler — sayfanın en altında, tek satır kaydırılabilir */}
+      {(data.recommendations?.length ?? 0) > 0 && (
+        <section>
+          <div className="section-title"><h2>{t('content.similar')}</h2></div>
+          <Slider ariaLabel={t('content.similar')}>
+            {data.recommendations?.map((item) => (
+              <div key={`${item.type}-${item.id}`} className="w-40 shrink-0 snap-start sm:w-44">
+                <ContentCard item={item} showType />
+              </div>
+            ))}
+          </Slider>
         </section>
       )}
     </div>
