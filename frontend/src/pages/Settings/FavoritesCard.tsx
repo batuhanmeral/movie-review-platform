@@ -6,7 +6,7 @@ import { useAuthStore } from '@/features/auth/authStore';
 import { contentApi, langFromI18n } from '@/api/content.api';
 import { usersApi } from '@/api/users.api';
 import { useDebounce } from '@/hooks/useDebounce';
-import { poster, profile } from '@/lib/tmdb';
+import { departmentLabel, poster, profile } from '@/lib/tmdb';
 import type { FavoriteContentRef } from '@/types/auth';
 import type { ContentItem, PersonSearchResult } from '@/types/content';
 
@@ -317,6 +317,7 @@ function PersonSelect({
         <ul className="mt-2 divide-y divide-white/5 rounded-lg bg-surface ring-1 ring-white/5">
           {results.map((p: PersonSearchResult) => {
             const photoUrl = profile(p.profilePath, 'w185');
+            const department = departmentLabel(p.knownForDepartment, t);
             return (
               <li key={p.id}>
                 <button
@@ -332,8 +333,8 @@ function PersonSelect({
                   </div>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-medium text-ink">{p.name}</span>
-                    {p.knownForDepartment && (
-                      <span className="block text-xs text-ink-muted">{p.knownForDepartment}</span>
+                    {department && (
+                      <span className="block text-xs text-ink-muted">{department}</span>
                     )}
                   </span>
                   {selectedId === p.id && <span className="text-accent">✓</span>}

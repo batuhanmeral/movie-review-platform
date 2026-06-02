@@ -26,6 +26,15 @@ export interface AuthUser {
   createdAt: string;            // Hesap oluşturulma tarihi
 }
 
+// Kullanıcı araması sonucundaki tek bir öğe (arama çubuğu önerileri için)
+export interface UserSearchResult {
+  id: string;
+  username: string;
+  displayName: string | null;
+  avatarUrl: string | null;
+  _count: { followers: number };
+}
+
 // Giriş veya kayıt işlemi sonrası dönen yanıt
 // Kullanıcı bilgileri ve JWT token çifti içerir
 export interface AuthResponse {

@@ -14,7 +14,7 @@ import {
 } from '../../utils/errors.js';
 import * as tmdb from '../../services/tmdb.service.js';
 import { listReviewsByUser } from '../reviews/reviews.service.js';
-import { changePasswordSchema, updateMeSchema } from './users.validator.js';
+import { changePasswordSchema, updateMeSchema, userSearchSchema } from './users.validator.js';
 
 export const usersRouter = Router();
 
@@ -354,6 +354,42 @@ const getReviews: RequestHandler = async (req, res, next) => {
   }
 };
 
+// İsme/kullanıcı adına göre kullanıcı araması yapar (arama çubuğu önerileri için).
+// En fazla 8 sonuç döndürür; sonuçlar prefix eşleşenler öne gelecek şekilde sıralanır.
+const searchUsers: RequestHandler = async (req, res, next) => {
+  try {
+    const q = String(req.query.q ?? '').trim();
+    const users = await prisma.user.findMany({
+      where: {
+        isSuspended: false,
+        OR: [
+          { username: { contains: q, mode: 'insensitive' } },
+          { displayName: { contains: q, mode: 'insensitive' } },
+        ],
+      },
+      select: {
+        id: true,
+        username: true,
+        displayName: true,
+        avatarUrl: true,
+        _count: { select: { followers: true } },
+      },
+      take: 8,
+    });
+    // Sorguyla başlayan kullanıcı adlarını öne al, ardından takipçi sayısına göre sırala
+    const lower = q.toLowerCase();
+    users.sort((a, b) => {
+      const ap = a.username.toLowerCase().startsWith(lower) ? 0 : 1;
+      const bp = b.username.toLowerCase().startsWith(lower) ? 0 : 1;
+      if (ap !== bp) return ap - bp;
+      return b._count.followers - a._count.followers;
+    });
+    res.json(users);
+  } catch (err) {
+    next(err);
+  }
+};
+
 usersRouter.get('/me', requireAuth, getMe);
 usersRouter.patch('/me', requireAuth, validate(updateMeSchema), updateMe);
 
@@ -364,7 +400,8 @@ usersRouter.post(
   changePassword,
 );
 usersRouter.delete('/me', requireAuth, deleteMe);
-// Not: /:username/* alt rotaları /:username'den önce tanımlanmalı
+// Not: sabit yollar (/search) ve /:username/* alt rotaları /:username'den önce tanımlanmalı
+usersRouter.get('/search', validate(userSearchSchema, 'query'), searchUsers);
 usersRouter.get('/:username/favorites', getFavorites);
 usersRouter.get('/:username/reviews', optionalAuth, getReviews);
 

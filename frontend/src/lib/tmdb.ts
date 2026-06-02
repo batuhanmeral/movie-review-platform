@@ -28,6 +28,17 @@ export function profile(path: string | null, size: ProfileSize = 'w185'): string
   return `${IMAGE_BASE}/${size}${path}`;
 }
 
+// TMDB'nin known_for_department alanı dil parametresinden bağımsız olarak hep
+// İngilizce döner ("Acting", "Directing" vb.). Bu yüzden gösterimde çeviriyi kendimiz
+// yaparız: person.departments.<İngilizce ad> anahtarını dener, bulamazsa ham değeri döner.
+export function departmentLabel(
+  department: string | null,
+  t: (key: string, options?: Record<string, unknown>) => string,
+): string | null {
+  if (!department) return null;
+  return t(`person.departments.${department}`, { defaultValue: department });
+}
+
 // YouTube embed (gömülü) iframe URL'i oluşturur
 export function youtubeEmbed(key: string): string {
   return `https://www.youtube.com/embed/${key}`;

@@ -53,5 +53,11 @@ export const changePasswordSchema = z
     message: 'Şifreler eşleşmiyor',
   });
 
+// Kullanıcı araması: en az 2 karakterlik sorgu (query string'den gelir)
+export const userSearchSchema = z.object({
+  q: z.string().trim().min(2, 'En az 2 karakter girin').max(50),
+});
+
 export type UpdateMeInput = z.infer<typeof updateMeSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+export type UserSearchInput = z.infer<typeof userSearchSchema>;
