@@ -3,6 +3,7 @@ import * as service from './reviews.service.js';
 import { UnauthorizedError } from '../../utils/errors.js';
 import type { ListReviewsQuery } from './reviews.validator.js';
 
+// Yeni inceleme oluşturur ve 201 ile döndürür (giriş zorunlu)
 export const createReviewHandler: RequestHandler = async (req, res, next) => {
   try {
     if (!req.auth) throw new UnauthorizedError();
@@ -13,6 +14,7 @@ export const createReviewHandler: RequestHandler = async (req, res, next) => {
   }
 };
 
+// Mevcut incelemeyi günceller (yalnızca sahibi; yetki kontrolü serviste)
 export const updateReviewHandler: RequestHandler = async (req, res, next) => {
   try {
     if (!req.auth) throw new UnauthorizedError();
@@ -24,6 +26,7 @@ export const updateReviewHandler: RequestHandler = async (req, res, next) => {
   }
 };
 
+// İncelemeyi siler (sahibi veya admin); başarıda 204 döner
 export const deleteReviewHandler: RequestHandler = async (req, res, next) => {
   try {
     if (!req.auth) throw new UnauthorizedError();
@@ -35,6 +38,7 @@ export const deleteReviewHandler: RequestHandler = async (req, res, next) => {
   }
 };
 
+// Bir içeriğe ait incelemeleri sayfalı listeler (giriş opsiyonel; varsa beğeni durumu eklenir)
 export const listContentReviewsHandler: RequestHandler = async (req, res, next) => {
   try {
     const contentId = req.params.contentId as string;
@@ -49,6 +53,7 @@ export const listContentReviewsHandler: RequestHandler = async (req, res, next) 
   }
 };
 
+// Belirtilen zaman penceresindeki popüler incelemeleri döndürür (limit en fazla 50)
 export const popularReviewsHandler: RequestHandler = async (req, res, next) => {
   try {
     const windowDays = Number(req.query.windowDays ?? 7);
@@ -74,6 +79,7 @@ export const followingReviewsHandler: RequestHandler = async (req, res, next) =>
   }
 };
 
+// Giriş yapan kullanıcının ilgili içerik için kendi incelemesini döndürür (yoksa null)
 export const myReviewHandler: RequestHandler = async (req, res, next) => {
   try {
     if (!req.auth) throw new UnauthorizedError();
@@ -85,6 +91,7 @@ export const myReviewHandler: RequestHandler = async (req, res, next) => {
   }
 };
 
+// İncelemeye beğeniyi açıp kapatır; güncel beğeni durumu ve sayısını döndürür
 export const toggleLikeHandler: RequestHandler = async (req, res, next) => {
   try {
     if (!req.auth) throw new UnauthorizedError();
@@ -96,6 +103,7 @@ export const toggleLikeHandler: RequestHandler = async (req, res, next) => {
   }
 };
 
+// İncelemeye ait yorumları (eskiden yeniye) listeler
 export const listCommentsHandler: RequestHandler = async (req, res, next) => {
   try {
     const id = req.params.id as string;
@@ -106,6 +114,7 @@ export const listCommentsHandler: RequestHandler = async (req, res, next) => {
   }
 };
 
+// İncelemeye yeni yorum ekler ve 201 ile döndürür
 export const createCommentHandler: RequestHandler = async (req, res, next) => {
   try {
     if (!req.auth) throw new UnauthorizedError();
@@ -117,6 +126,7 @@ export const createCommentHandler: RequestHandler = async (req, res, next) => {
   }
 };
 
+// Yorumu günceller (yalnızca sahibi; yetki kontrolü serviste)
 export const updateCommentHandler: RequestHandler = async (req, res, next) => {
   try {
     if (!req.auth) throw new UnauthorizedError();
@@ -128,6 +138,7 @@ export const updateCommentHandler: RequestHandler = async (req, res, next) => {
   }
 };
 
+// Yorumu siler (sahibi veya admin); başarıda 204 döner
 export const deleteCommentHandler: RequestHandler = async (req, res, next) => {
   try {
     if (!req.auth) throw new UnauthorizedError();
