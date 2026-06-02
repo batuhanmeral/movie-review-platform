@@ -6,14 +6,13 @@ import { useAuthStore } from '@/features/auth/authStore';
 import { FeedReviewCard } from '@/features/feed/FeedReviewCard';
 import { FeedCardSkeleton } from '@/features/feed/FeedCardSkeleton';
 import { FeedCommunity } from '@/features/feed/FeedCommunity';
+import { FeedFilters, MobileFeedBar } from '@/features/feed/FeedFilters';
 import {
-  FeedFilters,
   FEED_WINDOWS,
-  MobileFeedBar,
   type FeedSortKey,
   type FeedSource,
   type FeedWindowKey,
-} from '@/features/feed/FeedFilters';
+} from '@/features/feed/feedFilters';
 
 // Çekilen incelemeleri seçilen ölçüte göre client-side sıralar.
 function sortReviews(list: PopularReview[], sort: FeedSortKey): PopularReview[] {
@@ -54,8 +53,7 @@ export default function FeedPage() {
     staleTime: 5 * 60 * 1000,
   });
 
-  const reviews = feed.data ?? [];
-  const sorted = useMemo(() => sortReviews(reviews, sort), [reviews, sort]);
+  const sorted = useMemo(() => sortReviews(feed.data ?? [], sort), [feed.data, sort]);
 
   const filterState = { source, setSource, sort, setSort, windowKey, setWindowKey, canFollow: isAuthed };
 

@@ -1,29 +1,12 @@
 import { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-
-// — Filtre tipleri ve sabitleri (FeedPage ile paylaşılır) —
-export type FeedSource = 'popular' | 'following';
-export type FeedSortKey = 'relevant' | 'newest' | 'mostLiked' | 'mostCommented';
-export type FeedWindowKey = 'week' | 'month' | 'all';
-
-export const FEED_WINDOWS: { key: FeedWindowKey; days: number }[] = [
-  { key: 'week', days: 7 },
-  { key: 'month', days: 30 },
-  { key: 'all', days: 3650 },
-];
-
-const FEED_SORTS: FeedSortKey[] = ['relevant', 'newest', 'mostLiked', 'mostCommented'];
-
-export interface FeedFilterState {
-  source: FeedSource;
-  setSource: (s: FeedSource) => void;
-  sort: FeedSortKey;
-  setSort: (s: FeedSortKey) => void;
-  windowKey: FeedWindowKey;
-  setWindowKey: (w: FeedWindowKey) => void;
-  // Viewer giriş yaptıysa "Takip Ettiklerin" kaynağı seçilebilir
-  canFollow: boolean;
-}
+import {
+  FEED_SORTS,
+  FEED_WINDOWS,
+  type FeedFilterState,
+  type FeedSortKey,
+  type FeedWindowKey,
+} from './feedFilters';
 
 // Sol kenar rayı: kaynak + sıralama + zaman filtreleri (lg+ ekranlarda).
 export function FeedFilters(props: FeedFilterState) {

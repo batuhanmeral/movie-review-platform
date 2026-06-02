@@ -78,8 +78,9 @@ const updateMe: RequestHandler = async (req, res, next) => {
       select: meSelect,
     });
     res.json(updated);
-  } catch (err: any) {
-    if (err?.code === 'P2002') {
+  } catch (err) {
+    // Benzersizlik ihlali (P2002): e-posta veya kullanıcı adı zaten kayıtlı
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
       next(new ConflictError('Bu e-posta veya kullanıcı adı zaten kullanımda.'));
       return;
     }

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { reviewsApi } from '@/api/reviews.api';
+import { apiErrorMessage } from '@/lib/apiError';
 import { RatingStarsInput } from '@/components/content/RatingStarsInput';
 import type { Review } from '@/types/review';
 
@@ -20,11 +21,12 @@ export function ReviewForm({ contentId, existing, onDone, onCancel }: Props) {
   const [spoiler, setSpoiler] = useState<boolean>(existing?.containsSpoiler ?? false);
   const [error, setError] = useState<string | null>(null);
 
+  // Düzenlenen inceleme (id veya alanları) değişince form alanlarını yeniden senkronla
   useEffect(() => {
     setRating(existing?.rating ?? 0);
     setBody(existing?.body ?? '');
     setSpoiler(existing?.containsSpoiler ?? false);
-  }, [existing?.id]);
+  }, [existing?.id, existing?.rating, existing?.body, existing?.containsSpoiler]);
 
   const invalidate = () => {
     // ['reviews'] öneki: içerik incelemeleri, kendi incelemem ve ana sayfa popüler incelemeler
@@ -45,8 +47,7 @@ export function ReviewForm({ contentId, existing, onDone, onCancel }: Props) {
       invalidate();
       onDone?.();
     },
-    onError: (err: any) =>
-      setError(err?.response?.data?.error?.message ?? t('reviews.form.saveFailed')),
+    onError: (err) => setError(apiErrorMessage(err, t('reviews.form.saveFailed'))),
   });
 
   const update = useMutation({
@@ -57,8 +58,7 @@ export function ReviewForm({ contentId, existing, onDone, onCancel }: Props) {
       invalidate();
       onDone?.();
     },
-    onError: (err: any) =>
-      setError(err?.response?.data?.error?.message ?? t('reviews.form.updateFailed')),
+    onError: (err) => setError(apiErrorMessage(err, t('reviews.form.updateFailed'))),
   });
 
   const remove = useMutation({

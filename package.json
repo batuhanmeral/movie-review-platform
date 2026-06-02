@@ -2,6 +2,7 @@
   "name": "sinefiles",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "description": "Social film/series review platform powered by TMDB.",
   "packageManager": "pnpm@9.12.0",
   "engines": {
@@ -10,6 +11,16 @@
   "scripts": {
     "dev:backend": "pnpm --filter ./backend dev",
     "dev:frontend": "pnpm --filter ./frontend dev",
-    "build": "pnpm -r build"
+    "build": "pnpm -r build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9",
+    "eslint": "^9",
+    "eslint-plugin-react-hooks": "^5",
+    "eslint-plugin-react-refresh": "^0.4",
+    "globals": "^15",
+    "typescript-eslint": "^8"
   }
 }
