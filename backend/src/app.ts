@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { env } from './config/env.js';
+import { UPLOADS_DIR } from './config/uploads.js';
 import { healthRouter } from './api/health/health.routes.js';
 import { authRouter } from './api/auth/auth.routes.js';
 import { contentRouter } from './api/content/content.routes.js';
@@ -31,6 +32,15 @@ export function createApp() {
 
   // URL-encoded verileri ayrıştır
   app.use(express.urlencoded({ extended: true }));
+
+  // Yüklenen dosyaları (avatar vb.) statik olarak sun.
+  // Cross-Origin-Resource-Policy: cross-origin → frontend (farklı port) görselleri yükleyebilsin
+  app.use(
+    '/uploads',
+    express.static(UPLOADS_DIR, {
+      setHeaders: (res) => res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'),
+    }),
+  );
 
   // Test ortamı hariç HTTP isteklerini logla
   if (env.NODE_ENV !== 'test') {

@@ -21,6 +21,7 @@ interface AuthState {
   }) => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (input: UpdateMeInput) => Promise<void>;
+  setUser: (user: AuthUser) => void;          // Sunucudan dönen güncel kullanıcıyı yaz
   setSession: (data: AuthResponse) => void;  // Token ve kullanıcı bilgilerini ayarla
   clear: () => void;                          // Oturum verilerini temizle
 }
@@ -95,6 +96,9 @@ export const useAuthStore = create<AuthState>()(
         const updated = await usersApi.updateMe(input);
         set({ user: updated });
       },
+
+      // Sunucudan dönen güncel kullanıcıyı doğrudan yaz (örn. avatar yükleme sonrası)
+      setUser: (user) => set({ user }),
     }),
     {
       name: 'sf-auth', // localStorage anahtarı

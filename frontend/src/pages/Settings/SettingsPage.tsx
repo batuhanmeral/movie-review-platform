@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState, type ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AxiosError } from 'axios';
@@ -51,26 +51,27 @@ export default function SettingsPage() {
       <ProfileCard />
       {/* Favori içerik, oyuncu ve yönetmen seçimi */}
       <FavoritesCard />
-      {/* Tema (açık/koyu) tercihi kartı */}
-      <ThemeCard />
+      {/* Tema ve dil tercihleri — tek satırda yan yana iki kart */}
+      <div className="grid gap-6 sm:grid-cols-2">
+        <ThemeCard />
+        <LanguageCard
+          current={i18n.resolvedLanguage as 'tr' | 'en' | undefined}
+          persisted={user ? LANG_TO_I18N[user.language] : undefined}
+          onChange={async (code) => {
+            const previous = i18n.resolvedLanguage as 'tr' | 'en' | undefined;
+            await i18n.changeLanguage(code);
+            try {
+              await updateProfile({ language: I18N_TO_LANG[code] });
+            } catch (err) {
+              // Kaydetme başarısız olursa önceki dile geri dön
+              if (previous) await i18n.changeLanguage(previous);
+              throw err;
+            }
+          }}
+        />
+      </div>
       {/* Şifre değiştirme kartı */}
       <PasswordCard />
-      {/* Dil tercihi kartı */}
-      <LanguageCard
-        current={i18n.resolvedLanguage as 'tr' | 'en' | undefined}
-        persisted={user ? LANG_TO_I18N[user.language] : undefined}
-        onChange={async (code) => {
-          const previous = i18n.resolvedLanguage as 'tr' | 'en' | undefined;
-          await i18n.changeLanguage(code);
-          try {
-            await updateProfile({ language: I18N_TO_LANG[code] });
-          } catch (err) {
-            // Kaydetme başarısız olursa önceki dile geri dön
-            if (previous) await i18n.changeLanguage(previous);
-            throw err;
-          }
-        }}
-      />
       {/* Tehlikeli bölge: hesap silme */}
       <DangerCard
         onDeleted={() => {
@@ -83,9 +84,33 @@ export default function SettingsPage() {
 
   // Profil bilgileri düzenleme kartı iç bileşeni
   function ProfileCard() {
+    const setUser = useAuthStore((s) => s.setUser);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
+    // Avatar: URL alanı ile dosya yükleme aynı state'i paylaşır (kayıtta çakışmasın)
+    const [avatarUrl, setAvatarUrl] = useState(user?.avatarUrl ?? '');
+    const [avatarBusy, setAvatarBusy] = useState(false);
+    const [avatarError, setAvatarError] = useState<string | null>(null);
+    const fileRef = useRef<HTMLInputElement>(null);
+
+    // Seçilen dosyayı yükler ve dönen güncel kullanıcıyla avatarı tazeler
+    const onPickAvatar = async (e: ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      e.target.value = ''; // aynı dosyanın tekrar seçilebilmesi için sıfırla
+      if (!file) return;
+      setAvatarError(null);
+      setAvatarBusy(true);
+      try {
+        const updated = await usersApi.uploadAvatar(file);
+        setUser(updated);
+        setAvatarUrl(updated.avatarUrl ?? '');
+      } catch (err) {
+        setAvatarError(extractError(err, t('settings.saveError')));
+      } finally {
+        setAvatarBusy(false);
+      }
+    };
 
     return (
       <section className="card">
@@ -110,6 +135,36 @@ export default function SettingsPage() {
             }
           }}
         >
+          {/* Avatar: önizleme + dosya yükleme */}
+          <div className="flex items-center gap-4">
+            <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-accent to-accent-cyan text-2xl font-bold text-surface ring-2 ring-surface">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
+              ) : (
+                (user?.displayName ?? user?.username ?? '?').charAt(0).toUpperCase()
+              )}
+            </div>
+            <div>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className="hidden"
+                onChange={onPickAvatar}
+              />
+              <button
+                type="button"
+                className="btn-outline"
+                disabled={avatarBusy}
+                onClick={() => fileRef.current?.click()}
+              >
+                {avatarBusy ? t('settings.avatarUploading') : t('settings.avatarUpload')}
+              </button>
+              <p className="mt-1 text-xs text-ink-muted">{t('settings.avatarHint')}</p>
+              {avatarError && <p className="form-error mt-1">{avatarError}</p>}
+            </div>
+          </div>
+
           <div className="grid gap-4 sm:grid-cols-2">
             {/* E-posta alanı */}
             <div>
@@ -130,11 +185,6 @@ export default function SettingsPage() {
             <div>
               <label className="label" htmlFor="location">{t('settings.location')}</label>
               <input className="input" id="location" name="location" placeholder={t('settings.locationPlaceholder')} defaultValue={user?.location ?? ''} maxLength={100} />
-            </div>
-            {/* Avatar URL alanı */}
-            <div className="sm:col-span-2">
-              <label className="label" htmlFor="avatarUrl">{t('settings.avatarUrl')}</label>
-              <input className="input" id="avatarUrl" name="avatarUrl" type="url" placeholder="https://…" defaultValue={user?.avatarUrl ?? ''} />
             </div>
             {/* Biyografi alanı */}
             <div className="sm:col-span-2">

@@ -56,6 +56,14 @@ export const usersApi = {
     return data;
   },
 
+  // Avatar fotoğrafı yükler (multipart/form-data); güncellenmiş kullanıcıyı döner
+  uploadAvatar: async (file: File): Promise<AuthUser> => {
+    const form = new FormData();
+    form.append('avatar', file);
+    const { data } = await apiClient.post<AuthUser>('/users/me/avatar', form);
+    return data;
+  },
+
 
   // Kullanıcının şifresini değiştirir (mevcut şifre doğrulamasıyla)
   changePassword: async (input: ChangePasswordInput): Promise<void> => {

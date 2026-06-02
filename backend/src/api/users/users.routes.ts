@@ -13,7 +13,9 @@ import {
   UnauthorizedError,
 } from '../../utils/errors.js';
 import * as tmdb from '../../services/tmdb.service.js';
+import { env } from '../../config/env.js';
 import { listReviewsByUser } from '../reviews/reviews.service.js';
+import { avatarUpload } from './avatar.middleware.js';
 import { changePasswordSchema, updateMeSchema, userSearchSchema } from './users.validator.js';
 
 export const usersRouter = Router();
@@ -84,6 +86,24 @@ const updateMe: RequestHandler = async (req, res, next) => {
       next(new ConflictError('Bu e-posta veya kullanıcı adı zaten kullanımda.'));
       return;
     }
+    next(err);
+  }
+};
+
+// Avatar fotoğrafı yükler: dosya diske kaydedilir (avatarUpload middleware'i),
+// ardından kullanıcının avatarUrl'i servis edilen statik adrese güncellenir.
+const uploadMyAvatar: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.auth) throw new UnauthorizedError();
+    if (!req.file) throw new BadRequestError('Dosya bulunamadı');
+    const avatarUrl = `${env.APP_URL}/uploads/avatars/${req.file.filename}`;
+    const updated = await prisma.user.update({
+      where: { id: req.auth.sub },
+      data: { avatarUrl },
+      select: meSelect,
+    });
+    res.json(updated);
+  } catch (err) {
     next(err);
   }
 };
@@ -422,6 +442,7 @@ usersRouter.post(
   validate(changePasswordSchema),
   changePassword,
 );
+usersRouter.post('/me/avatar', requireAuth, avatarUpload, uploadMyAvatar);
 usersRouter.delete('/me', requireAuth, deleteMe);
 // Not: sabit yollar (/search) ve /:username/* alt rotaları /:username'den önce tanımlanmalı
 usersRouter.get('/search', validate(userSearchSchema, 'query'), searchUsers);
