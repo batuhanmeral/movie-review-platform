@@ -53,6 +53,9 @@ export function FollowListModal({ username, kind, onClose }: FollowListModalProp
       );
       // Profil kartındaki sayaçlar değişmiş olabilir; profili tazele
       void queryClient.invalidateQueries({ queryKey: ['profile', username] });
+      // Akıştaki "takip ettiklerim" içeriği ve "Arkadaşlarım" kenar çubuğu tazelensin
+      void queryClient.invalidateQueries({ queryKey: ['feed'] });
+      void queryClient.invalidateQueries({ queryKey: ['myFollowing'] });
     },
   });
 

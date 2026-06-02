@@ -60,6 +60,9 @@ export default function ProfilePage() {
             }
           : prev,
       );
+      // Takip değişti: akıştaki "takip ettiklerim" içeriği ve "Arkadaşlarım" kenar çubuğu tazelensin
+      void queryClient.invalidateQueries({ queryKey: ['feed'] });
+      void queryClient.invalidateQueries({ queryKey: ['myFollowing'] });
     },
   });
 

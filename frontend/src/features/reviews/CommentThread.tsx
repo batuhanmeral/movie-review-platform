@@ -26,6 +26,8 @@ export function CommentThread({ reviewId }: Props) {
       setText('');
       qc.invalidateQueries({ queryKey: ['reviewComments', reviewId] });
       qc.invalidateQueries({ queryKey: ['reviews'] });
+      // Akıştaki kartın yorum sayacı da güncellensin
+      qc.invalidateQueries({ queryKey: ['feed'] });
     },
   });
 
@@ -34,6 +36,8 @@ export function CommentThread({ reviewId }: Props) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['reviewComments', reviewId] });
       qc.invalidateQueries({ queryKey: ['reviews'] });
+      // Akıştaki kartın yorum sayacı da güncellensin
+      qc.invalidateQueries({ queryKey: ['feed'] });
     },
   });
 

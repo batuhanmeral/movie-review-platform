@@ -27,8 +27,13 @@ export function ReviewForm({ contentId, existing, onDone, onCancel }: Props) {
   }, [existing?.id]);
 
   const invalidate = () => {
-    qc.invalidateQueries({ queryKey: ['reviews', contentId] });
-    qc.invalidateQueries({ queryKey: ['reviews', contentId, 'me'] });
+    // ['reviews'] öneki: içerik incelemeleri, kendi incelemem ve ana sayfa popüler incelemeler
+    qc.invalidateQueries({ queryKey: ['reviews'] });
+    // Sosyal akış (popüler + takip edilenler) yeni/değişen incelemeyi göstersin
+    qc.invalidateQueries({ queryKey: ['feed'] });
+    // Profil sayfasındaki kullanıcı inceleme listeleri
+    qc.invalidateQueries({ queryKey: ['userReviews'] });
+    // Detay sayfasının ortalama puan/sayaç bilgisi
     qc.invalidateQueries({ queryKey: ['content'] });
   };
 
