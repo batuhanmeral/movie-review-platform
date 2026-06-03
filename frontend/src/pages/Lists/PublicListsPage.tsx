@@ -4,11 +4,13 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { listsApi } from '@/api/lists.api';
 import { PopularListCard } from '@/features/list/PopularListCard';
+import { useAuthStore } from '@/features/auth/authStore';
 
 // Herkese açık popüler listeleri grid olarak gösteren sayfa (/lists).
 // Her kart, ilgili listenin detay sayfasına bağlanır.
 export default function PublicListsPage() {
   const { t } = useTranslation();
+  const isAuthed = useAuthStore((s) => Boolean(s.user));
   const [limit, setLimit] = useState(20);
 
   const {
@@ -21,38 +23,51 @@ export default function PublicListsPage() {
   });
 
   if (isLoading) {
-    return <div className="p-8 text-ink-muted">Yükleniyor…</div>;
+    return <div className="p-8 text-ink-muted">{t('home.loading')}</div>;
   }
 
   if (error) {
-    return <div className="p-8 text-ink-muted">Listeler yüklenemedi.</div>;
+    return <div className="p-8 text-ink-muted">{t('feed.error')}</div>;
   }
 
   return (
     <div className="min-h-screen bg-surface">
-      <div className="mx-auto max-w-6xl px-4 pt-8">
-        <div className="rounded-2xl border border-white/10 bg-surface-raised px-8 py-12">
-          <h1 className="text-4xl font-bold text-ink">🎬 {t('nav.lists', 'Listeler')}</h1>
-          <p className="mt-2 text-lg text-ink-muted">
-            Kullanıcıların oluşturduğu ve beğendiği en iyi film ve dizi listeleri
-          </p>
-        </div>
-      </div>
+      <div className="mx-auto max-w-6xl px-4 pt-8 space-y-8">
+        {/* Başlık kartı — altındaki grid ile hizalı, kompakt */}
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-white/10 bg-surface-raised px-5 py-4">
+          <div className="min-w-0">
+            <h1 className="font-display text-xl font-bold text-ink sm:text-2xl">
+              🎬 {t('lists.title')}
+            </h1>
+            <p className="mt-0.5 text-sm text-ink-muted">{t('lists.subtitle')}</p>
+          </div>
 
-      <div className="mx-auto max-w-6xl px-4 py-12">
+          {isAuthed && (
+            <Link
+              to="/my-lists"
+              className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-surface transition-colors hover:bg-accent/90"
+            >
+              <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4" aria-hidden="true">
+                <path fillRule="evenodd" d="M6 2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7.414A2 2 0 0 0 15.414 6L12 2.586A2 2 0 0 0 10.586 2H6Zm5 6a1 1 0 1 0-2 0v2H7a1 1 0 1 0 0 2h2v2a1 1 0 1 0 2 0v-2h2a1 1 0 1 0 0-2h-2V8Z" clipRule="evenodd" />
+              </svg>
+              {t('lists.myLists')}
+            </Link>
+          )}
+        </div>
+
         {!lists || lists.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-white/10 bg-surface-raised p-12 text-center">
-            <p className="mb-4 text-lg text-ink-muted">Henüz popüler liste yok.</p>
+            <p className="mb-4 text-lg text-ink-muted">{t('lists.empty')}</p>
             <Link
               to="/discover"
               className="inline-block rounded-lg bg-accent px-6 py-3 font-semibold text-surface transition-colors hover:bg-accent/90"
             >
-              Keşfet'e git
+              {t('discover.title')}
             </Link>
           </div>
         ) : (
           <>
-            <div className="flex flex-wrap justify-center gap-8">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {lists.map((list) => (
                 <PopularListCard key={list.id} list={list} to={`/lists/${list.id}`} />
               ))}
@@ -64,7 +79,7 @@ export default function PublicListsPage() {
                   onClick={() => setLimit((prev) => prev + 20)}
                   className="rounded-lg bg-white/10 px-6 py-3 font-semibold text-ink transition-all hover:bg-white/20"
                 >
-                  Daha Fazla Yükle
+                  {t('lists.loadMore')}
                 </button>
               </div>
             )}
