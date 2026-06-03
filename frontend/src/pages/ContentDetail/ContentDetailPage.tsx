@@ -8,6 +8,7 @@ import { RatingStars } from '@/components/content/RatingStars';
 import { ContentCard } from '@/components/content/ContentCard';
 import { Slider } from '@/components/layout/Slider';
 import { ReviewsSection } from '@/features/review/ReviewsSection';
+import { AddToListButton } from '@/components/lists/AddToListButton';
 import type { TmdbType } from '@/types/content';
 
 interface ContentDetailPageProps {
@@ -122,6 +123,11 @@ export default function ContentDetailPage({ type }: ContentDetailPageProps) {
               {data.genres.map((g) => (
                 <span key={g.id} className="rounded-full bg-surface-raised px-2.5 py-0.5 text-xs text-ink-muted ring-1 ring-white/5">{g.name}</span>
               ))}
+            </div>
+
+            {/* Listeye ekle (giriş yapan kullanıcılar) */}
+            <div className="mt-4">
+              <AddToListButton tmdbId={id} type={data.type} />
             </div>
 
             {/* Yönetmen */}

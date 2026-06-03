@@ -62,6 +62,10 @@ export function ProfileMenu() {
           >
             {t('nav.viewProfile')}
           </Link>
+          {/* Kendi listelerim bağlantısı */}
+          <Link to="/my-lists" className="block px-3 py-2 text-sm text-ink hover:bg-surface-muted">
+            {t('nav.myLists')}
+          </Link>
           {/* Ayarlar sayfası bağlantısı */}
           <Link to="/settings" className="block px-3 py-2 text-sm text-ink hover:bg-surface-muted">
             {t('nav.settings')}

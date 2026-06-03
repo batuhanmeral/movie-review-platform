@@ -53,6 +53,14 @@ export default function ListDetailPage() {
     },
   });
 
+  // Listeden öğe çıkar (yalnızca sahibi)
+  const removeItemMutation = useMutation({
+    mutationFn: (itemId: string) => listsApi.removeItem(listId!, itemId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['list', listId] });
+    },
+  });
+
   // dnd-kit sensörleri (fare + klavye erişilebilirliği)
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -129,6 +137,8 @@ export default function ListDetailPage() {
                       item={item}
                       index={index}
                       canDrag={canEdit && !reorderMutation.isPending}
+                      onRemove={canEdit ? () => removeItemMutation.mutate(item.id) : undefined}
+                      removing={removeItemMutation.isPending}
                     />
                   ))}
                 </div>

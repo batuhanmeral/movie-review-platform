@@ -7,6 +7,7 @@ import { usersApi } from '@/api/users.api';
 import { useAuthStore } from '@/features/auth/authStore';
 import { FollowListModal, type FollowListKind } from './FollowListModal';
 import { FavoritesSection } from './FavoritesSection';
+import { ProfileListsSection } from './ProfileListsSection';
 import { UserReviewsSection } from './UserReviewsSection';
 
 // Herkese açık kullanıcı profil verisi arayüzü
@@ -171,6 +172,9 @@ export default function ProfilePage() {
 
       {/* Favoriler: öne çıkan içerikler, oyuncu ve yönetmen */}
       <FavoritesSection username={data.username} />
+
+      {/* Kullanıcının listeleri */}
+      <ProfileListsSection username={data.username} />
 
       {/* Kullanıcının yazdığı incelemeler */}
       <UserReviewsSection username={data.username} />
