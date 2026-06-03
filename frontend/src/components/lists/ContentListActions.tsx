@@ -93,6 +93,7 @@ export function ContentListActions({ tmdbId, type }: Props) {
       {/* Tüm listeler için açılır menü */}
       <Dropdown
         align="left"
+        placement="top"
         triggerLabel="Listeye ekle"
         triggerClassName="btn-outline"
         trigger={<span>＋ Listeye Ekle ▾</span>}
