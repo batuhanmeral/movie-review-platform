@@ -93,7 +93,44 @@ export default function DiscoverPage() {
   const users = usersQuery.data ?? [];
 
   // Tüm sayfaların sonuçlarını tek bir diziye düzleştir
-  const items = useMemo(() => list.data?.pages.flatMap((p) => p.results) ?? [], [list.data]);
+  // Arama modunda TMDB search API filtre/sıralama desteklemez; client-side uygula
+  const items = useMemo(() => {
+    const raw = list.data?.pages.flatMap((p) => p.results) ?? [];
+    if (!isSearching) return raw;
+
+    // Filtreleme
+    const filtered = raw.filter((item) => {
+      if (filters.year) {
+        const itemYear = item.releaseDate ? new Date(item.releaseDate).getFullYear() : null;
+        if (itemYear !== filters.year) return false;
+      }
+      if (filters.genre && item.genreIds && !item.genreIds.includes(filters.genre)) return false;
+      if (filters.minRating && (item.voteAverage ?? 0) < filters.minRating) return false;
+      return true;
+    });
+
+    // Sıralama
+    const sorted = [...filtered];
+    switch (filters.sortBy) {
+      case 'vote_average.desc':
+        sorted.sort((a, b) => (b.voteAverage ?? 0) - (a.voteAverage ?? 0));
+        break;
+      case 'vote_count.desc':
+        sorted.sort((a, b) => (b.voteCount ?? 0) - (a.voteCount ?? 0));
+        break;
+      case 'release_date.desc':
+      case 'primary_release_date.desc':
+        sorted.sort((a, b) => {
+          const da = a.releaseDate ? +new Date(a.releaseDate) : 0;
+          const db = b.releaseDate ? +new Date(b.releaseDate) : 0;
+          return db - da;
+        });
+        break;
+      default: // popularity.desc — API varsayılan sırası zaten popülerlik
+        break;
+    }
+    return sorted;
+  }, [list.data, isSearching, filters.year, filters.genre, filters.minRating, filters.sortBy]);
 
   // Kişiler/Kullanıcılar kapsamı arama gerektirir; sorgu yoksa ipucu göster
   const needsQuery = !showTitles && !isSearching;
