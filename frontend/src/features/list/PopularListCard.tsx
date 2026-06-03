@@ -22,7 +22,7 @@ export function PopularListCard({ list, to }: Props) {
   const head = (
     <>
       {/* Poster önizleme alanı - 4 poster yan yana */}
-      <div className="relative grid aspect-[16/10] grid-cols-4 overflow-hidden rounded-lg ring-1 ring-white/10">
+      <div className="relative grid aspect-[16/10] grid-cols-4 overflow-hidden rounded-xl ring-1 ring-white/10">
         {posters.length > 0 ? (
           posters.map((p, i) => {
             const url = poster(p, 'w185');
@@ -57,7 +57,7 @@ export function PopularListCard({ list, to }: Props) {
   );
 
   return (
-    <article className="card w-72 shrink-0 snap-start sm:w-80">
+    <article className="card w-72 shrink-0 snap-start rounded-2xl sm:w-80">
       {to ? (
         <Link to={to} className="block transition-opacity hover:opacity-90">
           {head}

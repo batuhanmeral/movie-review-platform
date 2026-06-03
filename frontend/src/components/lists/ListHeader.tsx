@@ -104,7 +104,7 @@ export function ListHeader({ list, onToggleLike, isLiking, canShare }: Props) {
         </div>
 
         {list.coverImage && (
-          <div className="mt-6 h-40 overflow-hidden rounded-lg">
+          <div className="mt-6 h-40 overflow-hidden rounded-xl">
             <img src={list.coverImage} alt={list.title} className="h-full w-full object-cover" />
           </div>
         )}

@@ -32,7 +32,7 @@ export function SortableListItem({ item, index, canDrag, onRemove, removing }: P
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-4 rounded-lg bg-surface-raised p-4 ring-1 ring-white/10 transition-all ${
+      className={`flex items-center gap-4 rounded-xl bg-surface-raised p-4 ring-1 ring-white/10 transition-all ${
         isDragging ? 'ring-accent' : ''
       } ${canDrag ? 'cursor-grab active:cursor-grabbing' : ''}`}
       {...(canDrag ? attributes : {})}
@@ -51,7 +51,7 @@ export function SortableListItem({ item, index, canDrag, onRemove, removing }: P
         )}
       </div>
 
-      <div className="h-20 w-14 flex-shrink-0 overflow-hidden rounded-lg ring-1 ring-white/10">
+      <div className="h-20 w-14 flex-shrink-0 overflow-hidden rounded-xl ring-1 ring-white/10">
         {posterUrl ? (
           <img
             src={posterUrl}

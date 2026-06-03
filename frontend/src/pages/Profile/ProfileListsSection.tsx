@@ -45,10 +45,10 @@ export function ProfileListsSection({ username }: { username: string }) {
           <Link
             key={list.id}
             to={`/lists/${list.id}`}
-            className="group rounded-xl border border-white/10 bg-surface-raised p-4 transition-all hover:border-white/20"
+            className="group rounded-2xl border border-white/10 bg-surface-raised p-4 transition-all hover:border-white/20"
           >
             {/* Poster önizleme şeridi */}
-            <div className="grid aspect-[16/9] grid-cols-4 gap-0.5 overflow-hidden rounded-lg ring-1 ring-white/10">
+            <div className="grid aspect-[16/9] grid-cols-4 gap-0.5 overflow-hidden rounded-xl ring-1 ring-white/10">
               {list.previewPosters.length > 0 ? (
                 list.previewPosters.slice(0, 4).map((p, i) => {
                   const url = poster(p, 'w185');

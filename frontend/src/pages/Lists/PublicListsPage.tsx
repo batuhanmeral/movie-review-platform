@@ -41,7 +41,7 @@ export default function PublicListsPage() {
 
       <div className="mx-auto max-w-6xl px-4 py-12">
         {!lists || lists.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-white/10 bg-surface-raised p-12 text-center">
+          <div className="rounded-2xl border border-dashed border-white/10 bg-surface-raised p-12 text-center">
             <p className="mb-4 text-lg text-ink-muted">Henüz popüler liste yok.</p>
             <Link
               to="/discover"

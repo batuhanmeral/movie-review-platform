@@ -13,7 +13,7 @@ export function ListOwnerCard({ user }: Props) {
   return (
     <Link
       to={`/u/${user.username}`}
-      className="group block rounded-lg border border-white/10 bg-surface-raised p-6 transition-all hover:border-white/20"
+      className="group block rounded-2xl border border-white/10 bg-surface-raised p-6 transition-all hover:border-white/20"
     >
       <div className="flex items-start gap-4">
         <div className="flex-shrink-0">

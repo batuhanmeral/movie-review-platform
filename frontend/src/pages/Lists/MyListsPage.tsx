@@ -60,7 +60,7 @@ export default function MyListsPage() {
           {(lists ?? []).map((list) => (
             <div
               key={list.id}
-              className="group relative rounded-xl border border-white/10 bg-surface-raised p-5 transition-all hover:border-white/20"
+              className="group relative rounded-2xl border border-white/10 bg-surface-raised p-5 transition-all hover:border-white/20"
             >
               <Link to={`/lists/${list.id}`} className="block">
                 <div className="flex items-center gap-2">

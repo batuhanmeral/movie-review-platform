@@ -115,7 +115,7 @@ export default function ListDetailPage() {
           </h2>
 
           {list.items.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-white/10 bg-surface-raised p-8 text-center">
+            <div className="rounded-2xl border border-dashed border-white/10 bg-surface-raised p-8 text-center">
               <p className="text-ink-muted">Bu liste henüz boş</p>
             </div>
           ) : (
