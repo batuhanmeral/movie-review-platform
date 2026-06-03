@@ -8,7 +8,7 @@
 /* Tema renk değişkenleri (RGB üçlüleri — Tailwind alpha modifier'ları için).
    :root = koyu tema (varsayılan). html.light = açık tema override'ı. */
 :root {
-  --color-surface: 20 24 28;        /* #14181C */
+  --color-surface: 12 18 34;        /* #0C1222 — koyu lacivert */
   --color-surface-raised: 44 52 64; /* #2C3440 */
   --color-surface-muted: 63 75 91;  /* #3F4B5B */
   --color-surface-ring: 86 102 120; /* #566678 */
