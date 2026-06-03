@@ -141,6 +141,7 @@
   "person": {
     "notFound": "Actor not found.",
     "filmography": "Filmography",
+    "showMore": "Show more",
     "knownFor": "Known for",
     "born": "Born",
     "placeOfBirth": "Place of birth",

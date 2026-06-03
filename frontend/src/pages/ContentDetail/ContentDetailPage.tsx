@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -31,17 +31,6 @@ export default function ContentDetailPage({ type }: ContentDetailPageProps) {
   });
 
   const [trailerOpen, setTrailerOpen] = useState(false);
-  const castScrollRef = useRef<HTMLDivElement>(null);
-
-  // Oyuncu kadrosu bölümünü yatay kaydır
-  const scrollCast = (direction: 'left' | 'right') => {
-    if (!castScrollRef.current) return;
-    const scrollAmount = castScrollRef.current.clientWidth * 0.75;
-    castScrollRef.current.scrollBy({
-      left: direction === 'left' ? -scrollAmount : scrollAmount,
-      behavior: 'smooth',
-    });
-  };
 
   // Yükleme durumunda iskelet göster
   if (isLoading) return <DetailSkeleton />;
@@ -151,18 +140,11 @@ export default function ContentDetailPage({ type }: ContentDetailPageProps) {
         </div>
       </section>
 
-      {/* Oyuncu kadrosu bölümü */}
+      {/* Oyuncu kadrosu bölümü — benzer içerik slider'ı ile aynı düzen */}
       {data.cast.length > 0 && (
         <section>
-          <div className="mb-4 flex items-center justify-between">
-            <div className="section-title !mb-0"><h2>{t('content.cast')}</h2></div>
-            <div className="flex gap-2">
-              <button type="button" onClick={() => scrollCast('left')} className="grid h-8 w-8 place-items-center rounded-full bg-surface-raised text-ink transition-colors hover:bg-surface-muted ring-1 ring-white/5" aria-label="Sola kaydır">←</button>
-              <button type="button" onClick={() => scrollCast('right')} className="grid h-8 w-8 place-items-center rounded-full bg-surface-raised text-ink transition-colors hover:bg-surface-muted ring-1 ring-white/5" aria-label="Sağa kaydır">→</button>
-            </div>
-          </div>
-          {/* Yatay kaydırılabilir oyuncu kartları */}
-          <div ref={castScrollRef} className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 scrollbar-none [&::-webkit-scrollbar]:hidden">
+          <div className="section-title"><h2>{t('content.cast')}</h2></div>
+          <Slider ariaLabel={t('content.cast')}>
             {data.cast.map((member) => (
               <Link key={member.id} to={`/person/${member.id}`} className="card-hover block w-36 shrink-0 snap-start overflow-hidden p-0 ring-white/5 sm:w-40" aria-label={member.name}>
                 {member.profilePath ? (
@@ -176,7 +158,7 @@ export default function ContentDetailPage({ type }: ContentDetailPageProps) {
                 </div>
               </Link>
             ))}
-          </div>
+          </Slider>
         </section>
       )}
 

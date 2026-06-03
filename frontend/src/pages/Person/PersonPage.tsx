@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -6,8 +6,7 @@ import { ContentCard } from '@/components/content/ContentCard';
 import { PosterSkeleton } from '@/components/content/PosterSkeleton';
 import { contentApi, langFromI18n } from '@/api/content.api';
 import { departmentLabel, profile } from '@/lib/tmdb';
-import type { Genre, PersonCredit } from '@/types/content';
-import { PersonFilterPanel, type PersonFilterValues } from './PersonFilterPanel';
+import type { PersonCredit } from '@/types/content';
 
 // Oyuncu (kişi) sayfası: oyuncunun bilgileri + oynadığı yapımların filtrelenebilir,
 // sıralanabilir listesi. Tüm filtreleme/sıralama client-side yapılır çünkü TMDB
@@ -17,8 +16,6 @@ export default function PersonPage() {
   const { t, i18n } = useTranslation();
   const language = langFromI18n(i18n.resolvedLanguage);
 
-  const [filters, setFilters] = useState<PersonFilterValues>({ type: 'all', sort: 'popularity' });
-
   // Oyuncu profilini ve filmografisini getir
   const { data, isLoading, isError } = useQuery({
     queryKey: ['person', personId, language],
@@ -26,81 +23,25 @@ export default function PersonPage() {
     enabled: Boolean(personId),
   });
 
-  // Tür adlarını çözmek için film ve dizi tür listelerini getir (24s önbellek)
-  const movieGenres = useQuery({
-    queryKey: ['genres', 'movie', language],
-    queryFn: () => contentApi.genres('movie', language),
-    staleTime: 24 * 60 * 60 * 1000,
-  });
-  const tvGenres = useQuery({
-    queryKey: ['genres', 'tv', language],
-    queryFn: () => contentApi.genres('tv', language),
-    staleTime: 24 * 60 * 60 * 1000,
-  });
+  // Yapımları popülerliğe göre sıralanmış olarak göster
+  const sortedCredits = useMemo(
+    () => [...(data?.credits ?? [])].sort((a, b) => b.popularity - a.popularity),
+    [data],
+  );
 
-  // id → tür adı eşlemesi (film + dizi türleri birleşik)
-  const genreNameById = useMemo(() => {
-    const map = new Map<number, string>();
-    for (const g of [...(movieGenres.data ?? []), ...(tvGenres.data ?? [])]) {
-      if (!map.has(g.id)) map.set(g.id, g.name);
-    }
-    return map;
-  }, [movieGenres.data, tvGenres.data]);
+  // Sayfalama: başlangıçta 4 satır (6×4 = 24), her "daha fazla" ile 24 daha
+  const PAGE_SIZE = 24;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  // Başka bir kişiye geçilince görünür sayıyı sıfırla
+  useEffect(() => setVisibleCount(PAGE_SIZE), [personId]);
 
-  const credits = useMemo(() => data?.credits ?? [], [data]);
-
-  // Filtre panelinde gösterilecek seçenekler: yalnızca bu oyuncunun yapımlarında geçenler
-  const availableYears = useMemo(() => {
-    const years = new Set<number>();
-    for (const c of credits) {
-      if (c.releaseDate) years.add(new Date(c.releaseDate).getFullYear());
-    }
-    return [...years].sort((a, b) => b - a);
-  }, [credits]);
-
-  const availableGenres = useMemo<Genre[]>(() => {
-    const ids = new Set<number>();
-    for (const c of credits) for (const id of c.genreIds) ids.add(id);
-    return [...ids]
-      .map((id) => ({ id, name: genreNameById.get(id) ?? '' }))
-      .filter((g) => g.name)
-      .sort((a, b) => a.name.localeCompare(b.name));
-  }, [credits, genreNameById]);
-
-  // Filtreleri uygula, ardından sırala
-  const visibleCredits = useMemo(() => {
-    const filtered = credits.filter((c) => {
-      if (filters.type !== 'all' && c.type !== filters.type) return false;
-      if (filters.year) {
-        const y = c.releaseDate ? new Date(c.releaseDate).getFullYear() : null;
-        if (y !== filters.year) return false;
-      }
-      if (filters.genre && !c.genreIds.includes(filters.genre)) return false;
-      if (filters.minRating && c.voteAverage < filters.minRating) return false;
-      return true;
-    });
-
-    const sorted = [...filtered];
-    sorted.sort((a, b) => {
-      switch (filters.sort) {
-        case 'releaseDate':
-          return (b.releaseDate ?? '').localeCompare(a.releaseDate ?? '');
-        case 'rating':
-          return b.voteAverage - a.voteAverage;
-        case 'name':
-          return a.title.localeCompare(b.title);
-        case 'popularity':
-        default:
-          return b.popularity - a.popularity;
-      }
-    });
-    return sorted;
-  }, [credits, filters]);
+  const visibleCredits = sortedCredits.slice(0, visibleCount);
+  const hasMore = visibleCount < sortedCredits.length;
 
   if (isLoading) {
     return (
-      <div className="grid gap-6 lg:grid-cols-[260px,1fr]">
-        <div className="card h-96 animate-pulse" />
+      <div className="space-y-6">
+        <div className="card h-64 animate-pulse" />
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
           <PosterSkeleton count={10} />
         </div>
@@ -169,34 +110,38 @@ export default function PersonPage() {
         </div>
       </header>
 
-      {/* Filtre paneli + filmografi grid'i */}
-      <div className="grid gap-6 lg:grid-cols-[260px,1fr]">
-        <PersonFilterPanel
-          values={filters}
-          onChange={setFilters}
-          genres={availableGenres}
-          years={availableYears}
-        />
+      {/* Filmografi — tam genişlik */}
+      <section className="space-y-6">
+        <header>
+          <h2 className="font-display text-xl font-bold text-ink">{t('person.filmography')}</h2>
+          <p className="text-sm text-ink-muted">
+            {t('person.showing', { count: sortedCredits.length })}
+          </p>
+        </header>
 
-        <div className="space-y-6">
-          <header>
-            <h2 className="font-display text-xl font-bold text-ink">{t('person.filmography')}</h2>
-            <p className="text-sm text-ink-muted">
-              {t('person.showing', { count: visibleCredits.length })}
-            </p>
-          </header>
-
-          {visibleCredits.length === 0 ? (
-            <div className="card text-center text-ink-muted">{t('person.noResults')}</div>
-          ) : (
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
+        {sortedCredits.length === 0 ? (
+          <div className="card text-center text-ink-muted">{t('person.noResults')}</div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
               {visibleCredits.map((credit: PersonCredit) => (
                 <ContentCard key={`${credit.type}-${credit.id}`} item={credit} showType />
               ))}
             </div>
-          )}
-        </div>
-      </div>
+            {hasMore && (
+              <div className="flex justify-center pt-2">
+                <button
+                  type="button"
+                  className="btn-outline"
+                  onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                >
+                  {t('person.showMore', 'Daha fazla göster')}
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </section>
     </div>
   );
 }

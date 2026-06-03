@@ -8,8 +8,7 @@ import { usersApi } from '@/api/users.api';
 import type { Language } from '@/types/auth';
 import { FavoritesCard } from './FavoritesCard';
 
-// Veritabanı dil kodu ↔ i18n dil kodu eşleştirmeleri
-const LANG_TO_I18N: Record<Language, 'tr' | 'en'> = { TR: 'tr', EN: 'en' };
+// i18n dil kodu → veritabanı dil kodu eşleştirmesi
 const I18N_TO_LANG: Record<'tr' | 'en', Language> = { tr: 'TR', en: 'EN' };
 
 // API hata yanıtından okunabilir hata mesajı çıkarır
@@ -56,7 +55,6 @@ export default function SettingsPage() {
         <ThemeCard />
         <LanguageCard
           current={i18n.resolvedLanguage as 'tr' | 'en' | undefined}
-          persisted={user ? LANG_TO_I18N[user.language] : undefined}
           onChange={async (code) => {
             const previous = i18n.resolvedLanguage as 'tr' | 'en' | undefined;
             await i18n.changeLanguage(code);
@@ -135,33 +133,42 @@ export default function SettingsPage() {
             }
           }}
         >
-          {/* Avatar: önizleme + dosya yükleme */}
-          <div className="flex items-center gap-4">
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-accent to-accent-cyan text-2xl font-bold text-surface ring-2 ring-surface">
-              {avatarUrl ? (
-                <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
-              ) : (
-                (user?.displayName ?? user?.username ?? '?').charAt(0).toUpperCase()
-              )}
+          {/* Avatar (solda) + Hakkımda biyografisi (en sağda) aynı satırda */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+            {/* Avatar: önizleme + dosya yükleme */}
+            <div className="flex items-center gap-4">
+              <div className="flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-accent to-accent-cyan text-4xl font-bold text-surface ring-2 ring-surface">
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  (user?.displayName ?? user?.username ?? '?').charAt(0).toUpperCase()
+                )}
+              </div>
+              <div>
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  className="hidden"
+                  onChange={onPickAvatar}
+                />
+                <button
+                  type="button"
+                  className="btn-outline"
+                  disabled={avatarBusy}
+                  onClick={() => fileRef.current?.click()}
+                >
+                  {avatarBusy ? t('settings.avatarUploading') : t('settings.avatarUpload')}
+                </button>
+                <p className="mt-1 text-xs text-ink-muted">{t('settings.avatarHint')}</p>
+                {avatarError && <p className="form-error mt-1">{avatarError}</p>}
+              </div>
             </div>
-            <div>
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                className="hidden"
-                onChange={onPickAvatar}
-              />
-              <button
-                type="button"
-                className="btn-outline"
-                disabled={avatarBusy}
-                onClick={() => fileRef.current?.click()}
-              >
-                {avatarBusy ? t('settings.avatarUploading') : t('settings.avatarUpload')}
-              </button>
-              <p className="mt-1 text-xs text-ink-muted">{t('settings.avatarHint')}</p>
-              {avatarError && <p className="form-error mt-1">{avatarError}</p>}
+
+            {/* Hakkımda (biyografi) — kalan alanı doldurarak en sağda */}
+            <div className="w-full flex-1">
+              <label className="label" htmlFor="bio">{t('settings.bio')}</label>
+              <textarea className="input min-h-[112px] resize-y" id="bio" name="bio" maxLength={280} placeholder={t('settings.bioPlaceholder')} defaultValue={user?.bio ?? ''} />
             </div>
           </div>
 
@@ -185,11 +192,6 @@ export default function SettingsPage() {
             <div>
               <label className="label" htmlFor="location">{t('settings.location')}</label>
               <input className="input" id="location" name="location" placeholder={t('settings.locationPlaceholder')} defaultValue={user?.location ?? ''} maxLength={100} />
-            </div>
-            {/* Biyografi alanı */}
-            <div className="sm:col-span-2">
-              <label className="label" htmlFor="bio">{t('settings.bio')}</label>
-              <textarea className="input min-h-[88px] resize-y" id="bio" name="bio" maxLength={280} placeholder={t('settings.bioPlaceholder')} defaultValue={user?.bio ?? ''} />
             </div>
           </div>
 
@@ -306,12 +308,11 @@ function ThemeCard() {
 // Dil tercihi kartı bileşeni
 interface LanguageCardProps {
   current: 'tr' | 'en' | undefined;   // Şu anki aktif dil
-  persisted: 'tr' | 'en' | undefined; // Sunucuda kayıtlı dil
   onChange: (code: 'tr' | 'en') => Promise<void>;
 }
 
 // Dil değiştirme kartı - TR/EN butonlarıyla dil tercihi yönetimi
-function LanguageCard({ current, persisted, onChange }: LanguageCardProps) {
+function LanguageCard({ current, onChange }: LanguageCardProps) {
   const { t } = useTranslation();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -323,7 +324,6 @@ function LanguageCard({ current, persisted, onChange }: LanguageCardProps) {
       <div className="mt-3 flex gap-2">
         {(['tr', 'en'] as const).map((code) => {
           const active = current === code;
-          const isPersisted = persisted === code;
           return (
             <button
               key={code}
@@ -339,14 +339,10 @@ function LanguageCard({ current, persisted, onChange }: LanguageCardProps) {
                   setSaving(false);
                 }
               }}
-              disabled={saving || active}
+              disabled={saving}
               className={active ? 'btn-primary' : 'btn-outline'}
             >
               {code.toUpperCase()}
-              {/* Sunucuda kayıtlı dili işaretle */}
-              {isPersisted && (
-                <span className="ml-1 text-[10px] font-bold uppercase text-accent">●</span>
-              )}
             </button>
           );
         })}
