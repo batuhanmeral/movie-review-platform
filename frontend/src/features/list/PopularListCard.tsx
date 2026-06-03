@@ -15,14 +15,14 @@ interface Props {
 export function PopularListCard({ list, to }: Props) {
   // Liste sahibinin adının ilk harfini avatar olarak kullan
   const initial = (list.user.displayName || list.user.username).charAt(0).toUpperCase();
-  // İlk 4 posteri önizleme olarak göster
-  const posters = list.previewPosters.slice(0, 4);
+  // İlk 2 posteri önizleme olarak göster
+  const posters = list.previewPosters.slice(0, 2);
 
   // Poster önizleme + başlık/açıklama bloğu (iç link içermez, dış link'e sarılabilir)
   const head = (
     <>
-      {/* Poster önizleme alanı - 4 poster yan yana */}
-      <div className="relative grid aspect-[16/10] grid-cols-4 overflow-hidden rounded-lg ring-1 ring-white/10">
+      {/* Poster önizleme alanı - 2 poster yan yana */}
+      <div className="relative grid aspect-[16/10] grid-cols-2 overflow-hidden rounded-xl ring-1 ring-white/10">
         {posters.length > 0 ? (
           posters.map((p, i) => {
             const url = poster(p, 'w185');
@@ -38,7 +38,7 @@ export function PopularListCard({ list, to }: Props) {
           })
         ) : (
           // Liste boşsa yer tutucu göster
-          <div className="col-span-4 grid place-items-center bg-gradient-to-br from-surface-muted to-surface-raised text-xs text-ink-muted">
+          <div className="col-span-2 grid place-items-center bg-gradient-to-br from-surface-muted to-surface-raised text-xs text-ink-muted">
             Boş liste
           </div>
         )}
@@ -49,15 +49,15 @@ export function PopularListCard({ list, to }: Props) {
       {/* Başlık ve açıklama */}
       <div className="mt-3">
         <h3 className="truncate font-semibold text-ink">{list.title}</h3>
-        {list.description && (
-          <p className="mt-1 text-xs text-ink-muted line-clamp-2">{list.description}</p>
-        )}
+        <p className="mt-1 min-h-[2lh] text-xs text-ink-muted line-clamp-2">
+          {list.description || '\u00A0'}
+        </p>
       </div>
     </>
   );
 
   return (
-    <article className="card w-72 shrink-0 snap-start sm:w-80">
+    <article className="card w-full rounded-2xl">
       {to ? (
         <Link to={to} className="block transition-opacity hover:opacity-90">
           {head}

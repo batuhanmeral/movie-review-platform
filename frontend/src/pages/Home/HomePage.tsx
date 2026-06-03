@@ -107,7 +107,7 @@ export default function HomePage() {
       <section>
         <div className="section-title">
           <h2>{t('home.sections.popularReviews')}</h2>
-          <Link to="/discover">{t('home.sections.seeAll')} →</Link>
+          <Link to="/feed">{t('home.sections.seeAll')} →</Link>
         </div>
         {popularReviews.isLoading ? (
           <div className="card text-sm text-ink-muted">{t('home.loading')}</div>
@@ -127,6 +127,7 @@ export default function HomePage() {
       <section>
         <div className="section-title">
           <h2>{t('home.sections.popularLists')}</h2>
+          <Link to="/lists">{t('home.sections.seeAll')} →</Link>
         </div>
         {popularLists.isLoading ? (
           <div className="card text-sm text-ink-muted">{t('home.loading')}</div>
@@ -135,7 +136,9 @@ export default function HomePage() {
         ) : (
           <Slider ariaLabel={t('home.sections.popularLists')}>
             {popularLists.data!.map((l) => (
-              <PopularListCard key={l.id} list={l} />
+              <div key={l.id} className="w-64 shrink-0 snap-start sm:w-72">
+                <PopularListCard list={l} to={`/lists/${l.id}`} />
+              </div>
             ))}
           </Slider>
         )}
@@ -145,7 +148,6 @@ export default function HomePage() {
       <section>
         <div className="section-title">
           <h2>{t('home.sections.upcoming')}</h2>
-          <Link to="/discover">{t('home.sections.seeAll')} →</Link>
         </div>
         {upcoming.isLoading ? (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">

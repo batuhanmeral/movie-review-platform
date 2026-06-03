@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import {
   DndContext,
   closestCenter,
@@ -16,15 +16,15 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { listsApi } from '@/api/lists.api';
+import { useInvalidateLists } from '@/features/list/useInvalidateLists';
 import { ListHeader } from '@/components/lists/ListHeader';
-import { ListOwnerCard } from '@/components/lists/ListOwnerCard';
 import { SortableListItem } from '@/components/lists/SortableListItem';
 
 // Tek bir listenin detay sayfası (/lists/:listId).
 // Liste sahibi öğeleri sürükle-bırak ile yeniden sıralayabilir; herkes beğenebilir/paylaşabilir.
 export default function ListDetailPage() {
   const { listId } = useParams<{ listId: string }>();
-  const queryClient = useQueryClient();
+  const invalidateLists = useInvalidateLists();
 
   const {
     data: list,
@@ -40,17 +40,19 @@ export default function ListDetailPage() {
   const reorderMutation = useMutation({
     mutationFn: (items: { id: string; position: number }[]) =>
       listsApi.reorderListItems(listId!, items),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['list', listId] });
-    },
+    onSuccess: invalidateLists,
   });
 
   // Beğen/beğeniyi kaldır
   const toggleLikeMutation = useMutation({
     mutationFn: () => listsApi.toggleListLike(listId!),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['list', listId] });
-    },
+    onSuccess: invalidateLists,
+  });
+
+  // Listeden öğe çıkar (yalnızca sahibi)
+  const removeItemMutation = useMutation({
+    mutationFn: (itemId: string) => listsApi.removeItem(listId!, itemId),
+    onSuccess: invalidateLists,
   });
 
   // dnd-kit sensörleri (fare + klavye erişilebilirliği)
@@ -88,31 +90,27 @@ export default function ListDetailPage() {
 
   return (
     <div className="min-h-screen bg-surface">
-      <ListHeader
-        list={list}
-        onToggleLike={() => toggleLikeMutation.mutate()}
-        isLiking={toggleLikeMutation.isPending}
-        canShare={canShare}
-      />
-
       <div className="mx-auto max-w-4xl px-4 py-8">
-        <div className="mb-8">
-          <ListOwnerCard user={list.user} />
-        </div>
+        <ListHeader
+          list={list}
+          onToggleLike={() => toggleLikeMutation.mutate()}
+          isLiking={toggleLikeMutation.isPending}
+          canShare={canShare}
+        />
 
         {list.description && (
-          <div className="mb-8">
+          <div className="mt-8">
             <p className="leading-relaxed text-ink-muted">{list.description}</p>
           </div>
         )}
 
-        <div>
+        <div className="mt-8">
           <h2 className="mb-4 text-lg font-semibold text-ink">
             İçerikler ({list.items.length})
           </h2>
 
           {list.items.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-white/10 bg-surface-raised p-8 text-center">
+            <div className="rounded-2xl border border-dashed border-white/10 bg-surface-raised p-8 text-center">
               <p className="text-ink-muted">Bu liste henüz boş</p>
             </div>
           ) : (
@@ -129,6 +127,8 @@ export default function ListDetailPage() {
                       item={item}
                       index={index}
                       canDrag={canEdit && !reorderMutation.isPending}
+                      onRemove={canEdit ? () => removeItemMutation.mutate(item.id) : undefined}
+                      removing={removeItemMutation.isPending}
                     />
                   ))}
                 </div>

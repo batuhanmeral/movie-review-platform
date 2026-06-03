@@ -14,6 +14,7 @@
     "sectionUsers": "Kullanıcılar",
     "profileMenu": "Profil menüsü",
     "viewProfile": "Profilim",
+    "myLists": "Listelerim",
     "settings": "Ayarlar"
   },
   "auth": {
@@ -319,5 +320,23 @@
   "notFound": {
     "message": "Aradığın sayfayı bulamadık.",
     "backHome": "Ana sayfaya dön"
+  },
+  "list": {
+    "types": {
+      "WATCHED": "İzlenenler",
+      "WATCHLIST": "İzlenecekler",
+      "FAVORITES": "Favoriler",
+      "CUSTOM": "Özel Liste"
+    },
+    "public": "Herkese Açık",
+    "private": "Özel",
+    "items": "{{count}} içerik"
+  },
+  "lists": {
+    "title": "Listeler",
+    "subtitle": "Kullanıcıların oluşturduğu en iyi film ve dizi listeleri.",
+    "myLists": "Listelerim",
+    "empty": "Henüz popüler liste yok.",
+    "loadMore": "Daha Fazla Yükle"
   }
 }

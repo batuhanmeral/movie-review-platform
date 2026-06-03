@@ -10,6 +10,9 @@ interface DropdownProps {
   triggerLabel?: string;
   // Panelin hizalanacağı kenar
   align?: 'left' | 'right';
+  // Panelin açılacağı yön: 'bottom' (aşağı, varsayılan) veya 'top' (yukarı).
+  // Sayfa altındaki tetikleyiciler için 'top' kullanılarak kırpılma önlenir.
+  placement?: 'bottom' | 'top';
   // Panel içeriği — kapatma fonksiyonu argüman olarak verilir
   children: (close: () => void) => ReactNode;
 }
@@ -23,10 +26,22 @@ export function Dropdown({
   triggerClassName,
   triggerLabel,
   align = 'right',
+  placement = 'bottom',
   children,
 }: DropdownProps) {
   const [open, setOpen] = useState(false);
   const ref = useClickOutside<HTMLDivElement>(() => setOpen(false), open);
+
+  // Dikey konum + transform kökeni (Tailwind JIT için sınıf adları literal olmalı)
+  const vertical = placement === 'top' ? 'bottom-full mb-2' : 'top-full mt-2';
+  const origin =
+    placement === 'top'
+      ? align === 'right'
+        ? 'origin-bottom-right'
+        : 'origin-bottom-left'
+      : align === 'right'
+        ? 'origin-top-right'
+        : 'origin-top-left';
 
   return (
     <div className="relative" ref={ref}>
@@ -44,9 +59,9 @@ export function Dropdown({
       {open && (
         <div
           role="menu"
-          className={`absolute top-full z-40 mt-2 min-w-[13rem] ${
-            align === 'right' ? 'right-0 origin-top-right' : 'left-0 origin-top-left'
-          } animate-fade-in`}
+          className={`absolute z-40 min-w-[13rem] ${vertical} ${
+            align === 'right' ? 'right-0' : 'left-0'
+          } ${origin} animate-fade-in`}
         >
           <div className="glass overflow-hidden rounded-xl py-1.5 shadow-card">
             {children(() => setOpen(false))}

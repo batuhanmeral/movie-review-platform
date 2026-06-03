@@ -69,6 +69,33 @@ interface ToggleLikeResponse {
   likeCount: number;
 }
 
+export type ListType = 'WATCHED' | 'WATCHLIST' | 'FAVORITES' | 'CUSTOM';
+export type ListVisibility = 'PUBLIC' | 'PRIVATE';
+
+// Liste özeti (kendi listelerim / profil listeleri kartları için)
+export interface ListSummary {
+  id: string;
+  title: string;
+  description: string | null;
+  type: ListType;
+  visibility: ListVisibility;
+  coverImage: string | null;
+  createdAt: string;
+  updatedAt: string;
+  itemCount: number;
+  likeCount: number;
+}
+
+// "Listeye Ekle" menüsünde her liste: o içerik listede ise itemId dolu, değilse null
+export interface MyListSummary extends ListSummary {
+  itemId?: string | null;
+}
+
+// Profil listelerinde önizleme posterleriyle birlikte
+export interface UserListSummary extends ListSummary {
+  previewPosters: string[];
+}
+
 // Liste ile ilgili API çağrılarını içeren nesne
 export const listsApi = {
   // En popüler listeleri getirir (varsayılan limit: 10)
@@ -101,5 +128,58 @@ export const listsApi = {
   toggleListLike: async (listId: string): Promise<ToggleLikeResponse> => {
     const { data } = await apiClient.post<ToggleLikeResponse>(`/lists/${listId}/like`, {});
     return data;
+  },
+
+  // Giriş yapan kullanıcının kendi listeleri. ref verilirse her listede o içeriğin
+  // itemId'si döner ("Listeye Ekle" menüsü için).
+  myLists: async (ref?: { tmdbId: number; type: 'movie' | 'tv' }): Promise<MyListSummary[]> => {
+    const { data } = await apiClient.get<MyListSummary[]>('/lists/mine', {
+      params: ref ? { tmdbId: ref.tmdbId, type: ref.type } : undefined,
+    });
+    return data;
+  },
+
+  // Bir kullanıcının herkese açık listeleri (profil sayfası için)
+  userLists: async (username: string): Promise<UserListSummary[]> => {
+    const { data } = await apiClient.get<UserListSummary[]>(`/lists/users/${username}`);
+    return data;
+  },
+
+  // Yeni CUSTOM liste oluşturur
+  createList: async (input: {
+    title: string;
+    description?: string | null;
+    visibility?: ListVisibility;
+  }): Promise<ListSummary> => {
+    const { data } = await apiClient.post<ListSummary>('/lists', input);
+    return data;
+  },
+
+  // Listeyi günceller
+  updateList: async (
+    listId: string,
+    input: { title?: string; description?: string | null; visibility?: ListVisibility },
+  ): Promise<ListSummary> => {
+    const { data } = await apiClient.patch<ListSummary>(`/lists/${listId}`, input);
+    return data;
+  },
+
+  // Listeyi siler
+  deleteList: async (listId: string): Promise<void> => {
+    await apiClient.delete(`/lists/${listId}`);
+  },
+
+  // Listeye içerik ekler (TMDB referansıyla)
+  addItem: async (
+    listId: string,
+    input: { tmdbId: number; type: 'movie' | 'tv'; note?: string; language?: 'tr-TR' | 'en-US' },
+  ): Promise<ListItemDetail> => {
+    const { data } = await apiClient.post<ListItemDetail>(`/lists/${listId}/items`, input);
+    return data;
+  },
+
+  // Listeden bir öğeyi kaldırır
+  removeItem: async (listId: string, itemId: string): Promise<void> => {
+    await apiClient.delete(`/lists/${listId}/items/${itemId}`);
   },
 };

@@ -14,6 +14,7 @@
     "sectionUsers": "Users",
     "profileMenu": "Profile menu",
     "viewProfile": "My profile",
+    "myLists": "My lists",
     "settings": "Settings"
   },
   "auth": {
@@ -319,5 +320,23 @@
   "notFound": {
     "message": "We couldn't find the page you were looking for.",
     "backHome": "Back to home"
+  },
+  "list": {
+    "types": {
+      "WATCHED": "Watched",
+      "WATCHLIST": "Watchlist",
+      "FAVORITES": "Favorites",
+      "CUSTOM": "Custom List"
+    },
+    "public": "Public",
+    "private": "Private",
+    "items": "{{count}} items"
+  },
+  "lists": {
+    "title": "Lists",
+    "subtitle": "The best movie and TV show lists created by users.",
+    "myLists": "My Lists",
+    "empty": "No popular lists yet.",
+    "loadMore": "Load More"
   }
 }

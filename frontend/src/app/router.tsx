@@ -10,6 +10,7 @@ const FeedPage = lazy(() => import('@/pages/Feed/FeedPage'));
 const DiscoverPage = lazy(() => import('@/pages/Discover/DiscoverPage'));
 const PublicListsPage = lazy(() => import('@/pages/Lists/PublicListsPage'));
 const ListDetailPage = lazy(() => import('@/pages/Lists/ListDetailPage'));
+const MyListsPage = lazy(() => import('@/pages/Lists/MyListsPage'));
 const ContentDetailPage = lazy(() => import('@/pages/ContentDetail/ContentDetailPage'));
 const LoginPage = lazy(() => import('@/pages/Auth/LoginPage'));
 const RegisterPage = lazy(() => import('@/pages/Auth/RegisterPage'));
@@ -40,6 +41,15 @@ export function AppRouter() {
           <Route path="/discover" element={<DiscoverPage />} />
           {/* Popüler topluluk listeleri */}
           <Route path="/lists" element={<PublicListsPage />} />
+          {/* Kullanıcının kendi listeleri - sadece giriş yapmış kullanıcılar */}
+          <Route
+            path="/my-lists"
+            element={
+              <ProtectedRoute>
+                <MyListsPage />
+              </ProtectedRoute>
+            }
+          />
           {/* Liste detay sayfası - liste ID'si ile */}
           <Route path="/lists/:listId" element={<ListDetailPage />} />
           {/* Film detay sayfası - TMDB ID ile eşleşir */}

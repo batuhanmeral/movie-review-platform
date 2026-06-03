@@ -4,9 +4,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { apiClient } from '@/api/client';
 import { usersApi } from '@/api/users.api';
+import { listsApi } from '@/api/lists.api';
+import { listDisplayName } from '@/features/list/listLabels';
 import { useAuthStore } from '@/features/auth/authStore';
 import { FollowListModal, type FollowListKind } from './FollowListModal';
 import { FavoritesSection } from './FavoritesSection';
+import { ProfileListsSection } from './ProfileListsSection';
 import { UserReviewsSection } from './UserReviewsSection';
 
 // Herkese açık kullanıcı profil verisi arayüzü
@@ -43,6 +46,13 @@ export default function ProfilePage() {
       const { data } = await apiClient.get<PublicProfile>(`/users/${username}`);
       return data;
     },
+    enabled: Boolean(username),
+  });
+
+  // Kullanıcının listeleri — sistem listeleri üst istatistiklerde kısayol olarak gösterilir
+  const { data: userLists } = useQuery({
+    queryKey: ['user-lists', username],
+    queryFn: () => listsApi.userLists(username),
     enabled: Boolean(username),
   });
 
@@ -84,7 +94,10 @@ export default function ProfilePage() {
 
   const initial = (data.displayName ?? data.username).charAt(0).toUpperCase();
   const isOwnProfile = Boolean(user && user.username === data.username);
-  const watchedCount = data.watchedCount ?? 0;
+  // Sistem listeleri sabit sırada (üst istatistik kısayolları için)
+  const systemLists = (['WATCHED', 'WATCHLIST', 'FAVORITES'] as const)
+    .map((ty) => (userLists ?? []).find((l) => l.type === ty))
+    .filter((l): l is NonNullable<typeof l> => Boolean(l));
   // Bio metnini belirli uzunlukta kes
   const bioText = (data.bio ?? '').trim();
   const bioDisplay =
@@ -147,8 +160,16 @@ export default function ProfilePage() {
           )}
           {/* Sağ bölüm: İstatistikler */}
           <div className="lg:w-[30%] lg:self-stretch lg:border-l lg:border-white/10 lg:pl-6">
-            <div className="grid grid-cols-2 gap-3 text-center">
-              <Stat label={t('profile.watched')} value={watchedCount} />
+            <div className="grid grid-cols-3 gap-3 text-center">
+              {/* Sistem listeleri — tıklayınca ilgili listeye gider */}
+              {systemLists.map((list) => (
+                <Stat
+                  key={list.id}
+                  label={listDisplayName(list, t)}
+                  value={list.itemCount}
+                  to={`/lists/${list.id}`}
+                />
+              ))}
               <Stat
                 label={t('profile.reviews')}
                 value={data._count.reviews}
@@ -171,6 +192,9 @@ export default function ProfilePage() {
 
       {/* Favoriler: öne çıkan içerikler, oyuncu ve yönetmen */}
       <FavoritesSection username={data.username} />
+
+      {/* Kullanıcının listeleri */}
+      <ProfileListsSection username={data.username} />
 
       {/* Kullanıcının yazdığı incelemeler */}
       <UserReviewsSection username={data.username} />

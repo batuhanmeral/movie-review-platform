@@ -9,8 +9,8 @@
    :root = koyu tema (varsayılan). html.light = açık tema override'ı. */
 :root {
   --color-surface: 12 18 34;        /* #0C1222 — koyu lacivert */
-  --color-surface-raised: 44 52 64; /* #2C3440 */
-  --color-surface-muted: 63 75 91;  /* #3F4B5B */
+  --color-surface-raised: 30 37 46; /* #1E252E — koyulaştırılmış kart yüzeyi */
+  --color-surface-muted: 50 60 74;  /* #323C4A */
   --color-surface-ring: 86 102 120; /* #566678 */
 
   --color-accent: 16 185 129;       /* #10B981 */

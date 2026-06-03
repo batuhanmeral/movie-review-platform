@@ -7,11 +7,14 @@ interface Props {
   item: ListItemDetail;
   index: number;
   canDrag: boolean;
+  // Sahibi ise verilir → satırda silme butonu gösterilir
+  onRemove?: () => void;
+  removing?: boolean;
 }
 
 // Liste detayındaki tek bir içerik satırı. dnd-kit ile sürükle-bırak destekler;
 // canDrag false ise (sahibi değilsen) sürükleme devre dışıdır.
-export function SortableListItem({ item, index, canDrag }: Props) {
+export function SortableListItem({ item, index, canDrag, onRemove, removing }: Props) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
     disabled: !canDrag,
@@ -29,7 +32,7 @@ export function SortableListItem({ item, index, canDrag }: Props) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-4 rounded-lg bg-surface-raised p-4 ring-1 ring-white/10 transition-all ${
+      className={`flex items-center gap-4 rounded-xl bg-surface-raised p-4 ring-1 ring-white/10 transition-all ${
         isDragging ? 'ring-accent' : ''
       } ${canDrag ? 'cursor-grab active:cursor-grabbing' : ''}`}
       {...(canDrag ? attributes : {})}
@@ -48,7 +51,7 @@ export function SortableListItem({ item, index, canDrag }: Props) {
         )}
       </div>
 
-      <div className="h-20 w-14 flex-shrink-0 overflow-hidden rounded-lg ring-1 ring-white/10">
+      <div className="h-20 w-14 flex-shrink-0 overflow-hidden rounded-xl ring-1 ring-white/10">
         {posterUrl ? (
           <img
             src={posterUrl}
@@ -73,10 +76,27 @@ export function SortableListItem({ item, index, canDrag }: Props) {
         )}
       </div>
 
-      <div className="flex-shrink-0">
+      <div className="flex flex-shrink-0 items-center gap-2">
         <span className="inline-block rounded-full bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent">
           {item.content.type === 'MOVIE' ? '🎬 Film' : '📺 Dizi'}
         </span>
+        {/* Sahibi ise: listeden çıkar (pointer down'da drag başlamasın diye stopPropagation) */}
+        {onRemove && (
+          <button
+            type="button"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}
+            disabled={removing}
+            className="rounded-md p-1 text-ink-muted transition-colors hover:text-rating-low disabled:opacity-40"
+            aria-label="Listeden çıkar"
+            title="Listeden çıkar"
+          >
+            ✕
+          </button>
+        )}
       </div>
     </div>
   );
