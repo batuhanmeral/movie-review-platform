@@ -13,7 +13,7 @@ async function bootstrap() {
   const app = createApp();
   // Express sunucusunu belirtilen portta dinlemeye başla
   const server = app.listen(env.PORT, () => {
-    logger.info(`CineReviews API ${env.APP_URL} adresinde çalışıyor (${env.NODE_ENV})`);
+    logger.info(`Cinephiles API ${env.APP_URL} adresinde çalışıyor (${env.NODE_ENV})`);
   });
 
   // Sunucu kapatılırken kaynakları güvenli şekilde temizle

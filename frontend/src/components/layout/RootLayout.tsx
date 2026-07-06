@@ -27,13 +27,13 @@ export function RootLayout() {
       {/* Sabit navbar - sayfanın üstüne yapışık, opak arka plan */}
       <header className="sticky top-0 z-30 border-b border-white/5 bg-surface">
         <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6">
-          {/* Logo - gradient renkli CineReviews yazısı */}
+          {/* Logo - gradient renkli Cinephiles yazısı */}
           <Link to="/" className="group flex items-center font-display text-2xl sm:text-3xl font-black transition-transform duration-300 hover:scale-[1.02]">
             <span className="bg-gradient-to-r from-amber-300 via-rose-200 to-amber-400 bg-clip-text text-transparent">
               CINE
             </span>
             <span className="bg-gradient-to-r from-cyan-400 via-emerald-300 to-emerald-500 bg-clip-text font-black text-transparent">
-              REVIEWS
+              PHILES
             </span>
           </Link>
 
@@ -81,7 +81,7 @@ export function RootLayout() {
 
       {/* Alt bilgi (footer) */}
       <footer className="border-t border-white/5 py-8 text-center text-xs text-ink-dim">
-        © {new Date().getFullYear()} CineReviews · {t('footer.tagline')}
+        © {new Date().getFullYear()} Cinephiles · {t('footer.tagline')}
       </footer>
     </div>
   );

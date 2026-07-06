@@ -29,7 +29,7 @@ export const useThemeStore = create<ThemeState>()(
       toggle: () => get().setTheme(get().theme === 'dark' ? 'light' : 'dark'),
     }),
     {
-      name: 'sf-theme',
+      name: 'cp-theme',
       // Sayfa yenilendiğinde kalıcı temayı <html>'e geri uygula
       onRehydrateStorage: () => (state) => {
         if (state) applyTheme(state.theme);

@@ -111,7 +111,7 @@ export interface ContentDetail extends ContentItem {
   videos: VideoMeta[];               // Fragmanlar ve videolar
   recommendations?: ContentItem[];   // Benzer/önerilen içerikler (eski cache'te olmayabilir)
   contentId: string;                 // Sistemdeki içerik ID'si
-  communityRating: number | null;    // CineReviews topluluk puanı
+  communityRating: number | null;    // Cinephiles topluluk puanı
   communityReviewCount: number;      // Topluluk inceleme sayısı
   lastAirDate?: string | null;       // Diziler için son yayın tarihi
   status?: string;                   // Yayın durumu (ör: Returning Series)
