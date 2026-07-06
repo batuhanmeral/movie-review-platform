@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeToggle } from './ThemeToggle';
 import { SearchBar } from './SearchBar';
+import { NotificationBell } from './NotificationBell';
 import { ProfileMenu } from './ProfileMenu';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 
@@ -26,13 +27,13 @@ export function RootLayout() {
       {/* Sabit navbar - sayfanın üstüne yapışık, opak arka plan */}
       <header className="sticky top-0 z-30 border-b border-white/5 bg-surface">
         <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6">
-          {/* Logo - gradient renkli SineFiles yazısı */}
+          {/* Logo - gradient renkli CineReviews yazısı */}
           <Link to="/" className="group flex items-center font-display text-2xl sm:text-3xl font-black transition-transform duration-300 hover:scale-[1.02]">
             <span className="bg-gradient-to-r from-amber-300 via-rose-200 to-amber-400 bg-clip-text text-transparent">
-              SINE
+              CINE
             </span>
             <span className="bg-gradient-to-r from-cyan-400 via-emerald-300 to-emerald-500 bg-clip-text font-black text-transparent">
-              FILES
+              REVIEWS
             </span>
           </Link>
 
@@ -64,6 +65,9 @@ export function RootLayout() {
             {/* Arama çubuğu */}
             <SearchBar />
 
+            {/* Bildirim çanı - yalnızca giriş yapmış kullanıcıda görünür */}
+            <NotificationBell />
+
             {/* Kullanıcı profil menüsü / giriş butonları */}
             <ProfileMenu />
           </div>
@@ -77,7 +81,7 @@ export function RootLayout() {
 
       {/* Alt bilgi (footer) */}
       <footer className="border-t border-white/5 py-8 text-center text-xs text-ink-dim">
-        © {new Date().getFullYear()} SineFiles · {t('footer.tagline')}
+        © {new Date().getFullYear()} CineReviews · {t('footer.tagline')}
       </footer>
     </div>
   );

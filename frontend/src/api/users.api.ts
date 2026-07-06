@@ -42,6 +42,14 @@ export interface FollowUser {
   isSelf: boolean; // bu satır izleyicinin kendisi mi
 }
 
+// Engellenen kullanıcı satırı (Ayarlar sayfası)
+export interface BlockedUser {
+  id: string;
+  username: string;
+  displayName: string | null;
+  avatarUrl: string | null;
+}
+
 // Kullanıcı profili ile ilgili tüm API çağrılarını içeren nesne
 export const usersApi = {
   // Giriş yapan kullanıcının kendi profil bilgilerini getirir
@@ -96,6 +104,24 @@ export const usersApi = {
   // Bir kullanıcının takip ettiklerini getirir
   following: async (username: string): Promise<FollowUser[]> => {
     const { data } = await apiClient.get<FollowUser[]>(`/users/${username}/following`);
+    return data;
+  },
+
+  // Belirtilen kullanıcıyı engeller
+  block: async (username: string): Promise<{ blocked: boolean }> => {
+    const { data } = await apiClient.post<{ blocked: boolean }>(`/users/${username}/block`);
+    return data;
+  },
+
+  // Belirtilen kullanıcının engelini kaldırır
+  unblock: async (username: string): Promise<{ blocked: boolean }> => {
+    const { data } = await apiClient.delete<{ blocked: boolean }>(`/users/${username}/block`);
+    return data;
+  },
+
+  // Giriş yapan kullanıcının engellediği kişiler
+  blocks: async (): Promise<BlockedUser[]> => {
+    const { data } = await apiClient.get<BlockedUser[]>('/users/me/blocks');
     return data;
   },
 

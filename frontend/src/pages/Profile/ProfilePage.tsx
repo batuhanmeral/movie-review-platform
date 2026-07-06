@@ -23,6 +23,7 @@ interface PublicProfile {
   createdAt: string;
   watchedCount?: number;
   isFollowing?: boolean;
+  isBlocked?: boolean;
   _count: { reviews: number; followers: number; following: number };
 }
 
@@ -71,6 +72,17 @@ export default function ProfilePage() {
           : prev,
       );
       // Takip değişti: akıştaki "takip ettiklerim" içeriği ve "Arkadaşlarım" kenar çubuğu tazelensin
+      void queryClient.invalidateQueries({ queryKey: ['feed'] });
+      void queryClient.invalidateQueries({ queryKey: ['myFollowing'] });
+    },
+  });
+
+  // Engelle / engeli kaldır. Engelleme karşılıklı takipleri de kaldırır.
+  const blockMutation = useMutation({
+    mutationFn: (isBlocked: boolean) =>
+      isBlocked ? usersApi.unblock(username) : usersApi.block(username),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: profileKey });
       void queryClient.invalidateQueries({ queryKey: ['feed'] });
       void queryClient.invalidateQueries({ queryKey: ['myFollowing'] });
     },
@@ -130,14 +142,31 @@ export default function ProfilePage() {
                 ) : !user ? (
                   <Link to="/login" className="btn-outline px-3 py-1 text-xs">{t('profile.follow')}</Link>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => followMutation.mutate(Boolean(data.isFollowing))}
-                    disabled={followMutation.isPending}
-                    className={`${data.isFollowing ? 'btn-outline' : 'btn'} px-3 py-1 text-xs disabled:opacity-60`}
-                  >
-                    {data.isFollowing ? t('profile.unfollow') : t('profile.follow')}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {/* Engellenmişken takip butonu gizlenir */}
+                    {!data.isBlocked && (
+                      <button
+                        type="button"
+                        onClick={() => followMutation.mutate(Boolean(data.isFollowing))}
+                        disabled={followMutation.isPending}
+                        className={`${data.isFollowing ? 'btn-outline' : 'btn'} px-3 py-1 text-xs disabled:opacity-60`}
+                      >
+                        {data.isFollowing ? t('profile.unfollow') : t('profile.follow')}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (data.isBlocked || window.confirm(t('profile.blockConfirm', { name: data.displayName ?? data.username }))) {
+                          blockMutation.mutate(Boolean(data.isBlocked));
+                        }
+                      }}
+                      disabled={blockMutation.isPending}
+                      className="btn-outline px-3 py-1 text-xs text-rating-low disabled:opacity-60"
+                    >
+                      {data.isBlocked ? t('profile.unblock') : t('profile.block')}
+                    </button>
+                  </div>
                 )}
               </div>
               <p className="text-sm text-ink-muted">@{data.username}</p>

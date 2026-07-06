@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { reviewsApi } from '@/api/reviews.api';
+import { apiErrorMessage } from '@/lib/apiError';
 import { useAuthStore } from '@/features/auth/authStore';
 import { RatingStars } from '@/components/content/RatingStars';
 import type { Review } from '@/types/review';
@@ -28,6 +29,17 @@ export function ReviewItem({ review, contentId, isOwn = false }: Props) {
       qc.invalidateQueries({ queryKey: ['reviews', contentId] });
     },
   });
+
+  const report = useMutation({
+    mutationFn: (reason: string) => reviewsApi.report(review.id, reason),
+    onSuccess: () => window.alert(t('reviews.reported')),
+    onError: (err) => window.alert(apiErrorMessage(err, t('reviews.reportFailed'))),
+  });
+
+  const handleReport = () => {
+    const reason = window.prompt(t('reviews.reportPrompt'));
+    if (reason && reason.trim()) report.mutate(reason.trim());
+  };
 
   const initial = (review.user.displayName || review.user.username).charAt(0).toUpperCase();
   const date = new Date(review.createdAt).toLocaleDateString();
@@ -119,7 +131,7 @@ export function ReviewItem({ review, contentId, isOwn = false }: Props) {
             {t('reviews.flagged')}
           </span>
         )}
-        {isOwn && (
+        {isOwn ? (
           <button
             type="button"
             onClick={() => setEditing(true)}
@@ -127,6 +139,17 @@ export function ReviewItem({ review, contentId, isOwn = false }: Props) {
           >
             {t('reviews.edit')}
           </button>
+        ) : (
+          me && (
+            <button
+              type="button"
+              onClick={handleReport}
+              disabled={report.isPending}
+              className="ml-auto text-ink-dim transition-colors hover:text-rating-low disabled:opacity-50"
+            >
+              {t('reviews.report')}
+            </button>
+          )
         )}
       </footer>
 

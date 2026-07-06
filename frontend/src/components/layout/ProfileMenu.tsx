@@ -70,6 +70,15 @@ export function ProfileMenu() {
           <Link to="/settings" className="block px-3 py-2 text-sm text-ink hover:bg-surface-muted">
             {t('nav.settings')}
           </Link>
+          {/* Admin Paneli bağlantısı - YALNIZCA ADMIN rolüne sahip kullanıcılarda görünür */}
+          {user.role === 'ADMIN' && (
+            <Link
+              to="/admin"
+              className="block border-t border-white/5 px-3 py-2 text-sm font-semibold text-accent hover:bg-surface-muted"
+            >
+              {t('nav.adminPanel')}
+            </Link>
+          )}
           {/* Çıkış butonu */}
           <button
             type="button"

@@ -15,7 +15,8 @@
     "profileMenu": "Profile menu",
     "viewProfile": "My profile",
     "myLists": "My lists",
-    "settings": "Settings"
+    "settings": "Settings",
+    "adminPanel": "Admin Panel"
   },
   "auth": {
     "login": "Sign in",
@@ -125,6 +126,9 @@
   "profile": {
     "follow": "Follow",
     "unfollow": "Unfollow",
+    "block": "Block",
+    "unblock": "Unblock",
+    "blockConfirm": "Block {{name}}? Mutual follows will be removed.",
     "editProfile": "Edit profile",
     "watched": "Watched",
     "reviews": "Reviews",
@@ -226,6 +230,9 @@
     "languageHelp": "Interface language updates instantly and is saved to your account.",
     "saving": "saving…",
     "saveError": "Save failed",
+    "blocked": "Blocked Users",
+    "blockedHelp": "People you block can't follow you, send you notifications or comment on your reviews.",
+    "blockedEmpty": "You haven't blocked anyone yet.",
     "dangerZone": "Danger zone",
     "deleteHelp": "Permanently delete your account and all data. This cannot be undone.",
     "deleteAccount": "Delete my account",
@@ -245,6 +252,11 @@
     "spoilerHidden": "⚠ Contains spoiler — tap to show",
     "flagged": "flagged",
     "like": "Like",
+    "report": "Report",
+    "reportPrompt": "Why are you reporting this review?",
+    "reportCommentPrompt": "Why are you reporting this comment?",
+    "reported": "Reported. Thank you.",
+    "reportFailed": "Report failed",
     "form": {
       "writeTitle": "Write a review",
       "editTitle": "Update your review",
@@ -313,6 +325,23 @@
     "friends": {
       "title": "Following",
       "subtitle": "People you follow"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "You have no notifications yet",
+    "loading": "Loading…",
+    "markAllRead": "Mark all as read",
+    "viewAll": "View all",
+    "loadMore": "Load more",
+    "someone": "Someone",
+    "msg": {
+      "newFollower": "{{name}} started following you",
+      "reviewLike": "{{name}} liked your review",
+      "reviewComment": "{{name}} commented on your review",
+      "listLike": "{{name}} liked your list",
+      "mention": "{{name}} mentioned you",
+      "announcement": "New announcement"
     }
   },
   "footer": {

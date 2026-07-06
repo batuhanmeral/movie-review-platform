@@ -2,10 +2,15 @@ import { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { RootLayout } from '@/components/layout/RootLayout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { AdminRoute } from '@/components/auth/AdminRoute';
 import { AdminLayout } from '@/pages/admin/AdminLayout';
 import { AdminDashboard } from '@/pages/admin/AdminDashboard';
 import { AdminUsers } from '@/pages/admin/AdminUsers';
 import { AdminContent } from '@/pages/admin/AdminContent';
+import { AdminModeration } from '@/pages/admin/AdminModeration';
+import { AdminStats } from '@/pages/admin/AdminStats';
+import { AdminAnnouncements } from '@/pages/admin/AdminAnnouncements';
+import { AdminAudit } from '@/pages/admin/AdminAudit';
 
 // Lazy loading ile sayfa bileşenlerini dinamik olarak içe aktar
 // Bu, ilk yükleme boyutunu küçültür ve performansı artırır
@@ -22,6 +27,8 @@ const ProfilePage = lazy(() => import('@/pages/Profile/ProfilePage'));
 const UserReviewsPage = lazy(() => import('@/pages/Profile/UserReviewsPage'));
 const PersonPage = lazy(() => import('@/pages/Person/PersonPage'));
 const SettingsPage = lazy(() => import('@/pages/Settings/SettingsPage'));
+const NotificationsPage = lazy(() => import('@/pages/Notifications/NotificationsPage'));
+const ReviewRedirectPage = lazy(() => import('@/pages/Review/ReviewRedirectPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFound/NotFoundPage'));
 
 // Sayfa bileşenleri yüklenirken gösterilecek yükleme göstergesi
@@ -35,11 +42,22 @@ export function AppRouter() {
   return (
     <Suspense fallback={<PageFallback />}>
       <Routes>
-        {/* ADMIN ROTALARI */}
-        <Route path="/admin" element={<AdminLayout />}>
+        {/* ADMIN ROTALARI - yalnızca ADMIN rolü erişebilir (AdminRoute guard) */}
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
           <Route path="" element={<AdminDashboard />} />
           <Route path="users" element={<AdminUsers />} />
           <Route path="content" element={<AdminContent />} />
+          <Route path="moderation" element={<AdminModeration />} />
+          <Route path="stats" element={<AdminStats />} />
+          <Route path="announcements" element={<AdminAnnouncements />} />
+          <Route path="audit" element={<AdminAudit />} />
         </Route>
 
         {/* Tüm sayfalar RootLayout (navbar + footer) içinde render edilir */}
@@ -64,6 +82,8 @@ export function AppRouter() {
           {/* Liste detay sayfası - liste ID'si ile */}
           <Route path="/lists/:listId" element={<ListDetailPage />} />
           {/* Film detay sayfası - TMDB ID ile eşleşir */}
+          {/* Bildirim bağlantıları için: incelemeyi içerik sayfasına çevirir */}
+          <Route path="/review/:reviewId" element={<ReviewRedirectPage />} />
           <Route path="/movie/:tmdbId" element={<ContentDetailPage type="movie" />} />
           {/* Dizi detay sayfası - TMDB ID ile eşleşir */}
           <Route path="/tv/:tmdbId" element={<ContentDetailPage type="tv" />} />
@@ -82,6 +102,15 @@ export function AppRouter() {
             element={
               <ProtectedRoute>
                 <SettingsPage />
+              </ProtectedRoute>
+            }
+          />
+          {/* Bildirimler — sadece giriş yapmış kullanıcılar */}
+          <Route
+            path="/notifications"
+            element={
+              <ProtectedRoute>
+                <NotificationsPage />
               </ProtectedRoute>
             }
           />
