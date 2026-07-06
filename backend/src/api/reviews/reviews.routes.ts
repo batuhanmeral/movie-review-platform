@@ -6,11 +6,14 @@ import {
   createReviewHandler,
   deleteCommentHandler,
   deleteReviewHandler,
+  getReviewTargetHandler,
   listCommentsHandler,
   followingReviewsHandler,
   listContentReviewsHandler,
   myReviewHandler,
   popularReviewsHandler,
+  reportCommentHandler,
+  reportReviewHandler,
   toggleLikeHandler,
   updateCommentHandler,
   updateReviewHandler,
@@ -20,6 +23,7 @@ import {
   createCommentSchema,
   createReviewSchema,
   listReviewsQuerySchema,
+  reportSchema,
   updateCommentSchema,
   updateReviewSchema,
 } from './reviews.validator.js';
@@ -35,12 +39,19 @@ reviewsRouter.get('/following', requireAuth, followingReviewsHandler);
 // Yeni inceleme oluşturma
 reviewsRouter.post('/', requireAuth, validate(createReviewSchema), createReviewHandler);
 
+// İncelemenin bağlı olduğu içeriğin adresi (bildirim yönlendirmeleri için).
+// Not: '/popular' ve '/following' gibi sabit yollardan sonra tanımlanmalı.
+reviewsRouter.get('/:id/target', getReviewTargetHandler);
+
 // İnceleme güncelleme/silme (sahibi veya admin)
 reviewsRouter.put('/:id', requireAuth, validate(updateReviewSchema), updateReviewHandler);
 reviewsRouter.delete('/:id', requireAuth, deleteReviewHandler);
 
 // Beğeni toggle
 reviewsRouter.post('/:id/likes', requireAuth, toggleLikeHandler);
+
+// İncelemeyi raporla (moderasyon)
+reviewsRouter.post('/:id/report', requireAuth, validate(reportSchema), reportReviewHandler);
 
 // Yorumlar
 reviewsRouter.get('/:id/comments', listCommentsHandler);
@@ -52,6 +63,13 @@ reviewsRouter.put(
   updateCommentHandler,
 );
 reviewsRouter.delete('/comments/:commentId', requireAuth, deleteCommentHandler);
+// Yorumu raporla (moderasyon)
+reviewsRouter.post(
+  '/comments/:commentId/report',
+  requireAuth,
+  validate(reportSchema),
+  reportCommentHandler,
+);
 
 // İçeriğe ait incelemeler ve kullanıcının kendi incelemesi
 // Bu rotalar /api/content altında mount edilir.

@@ -2,10 +2,12 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '../../config/db.js';
 import { ConflictError, ForbiddenError, NotFoundError } from '../../utils/errors.js';
 import { containsProfanity } from '../../services/profanity.service.js';
+import { createNotification, notifyMentions } from '../notifications/notifications.service.js';
 import type {
   CreateCommentInput,
   CreateReviewInput,
   ListReviewsQuery,
+  ReportInput,
   UpdateCommentInput,
   UpdateReviewInput,
 } from './reviews.validator.js';
@@ -88,6 +90,13 @@ export async function createReview(userId: string, input: CreateReviewInput) {
       },
       include: reviewInclude,
     });
+    // İnceleme metnindeki @bahsetmeler için bildirim üret
+    await notifyMentions({
+      actorId: userId,
+      text: input.body,
+      entityType: 'review',
+      entityId: review.id,
+    });
     return shape(review, false);
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
@@ -128,6 +137,12 @@ export async function deleteReview(userId: string, role: 'USER' | 'ADMIN', id: s
   const existing = await prisma.review.findUnique({ where: { id } });
   if (!existing) throw new NotFoundError('İnceleme bulunamadı');
   if (existing.userId !== userId && role !== 'ADMIN') throw new ForbiddenError();
+  // Silme, rapor kayıtlarında reviewId'yi NULL'a çeker (SetNull); açık raporlar
+  // moderasyon kuyruğunda hedefsiz PENDING olarak kalmasın diye önce çözülür.
+  await prisma.report.updateMany({
+    where: { reviewId: id, status: { in: ['PENDING', 'REVIEWED'] } },
+    data: { status: 'RESOLVED', resolvedAt: new Date() },
+  });
   await prisma.review.delete({ where: { id } });
 }
 
@@ -280,10 +295,32 @@ export async function toggleLike(userId: string, reviewId: string) {
     await prisma.reviewLike.delete({ where: { id: existing.id } });
   } else {
     await prisma.reviewLike.create({ data: { reviewId, userId } });
+    // İnceleme sahibine beğeni bildirimi (kendi beğenisi createNotification içinde elenir)
+    await createNotification({
+      recipientId: review.userId,
+      actorId: userId,
+      type: 'REVIEW_LIKE',
+      entityType: 'review',
+      entityId: reviewId,
+    });
   }
 
   const likeCount = await prisma.reviewLike.count({ where: { reviewId } });
   return { liked: !existing, likeCount };
+}
+
+// Bildirimlerden gelinen "/review/:id" yönlendirmesi için incelemenin
+// bağlı olduğu içeriğin adresini (tür + TMDB id) döndürür.
+export async function getReviewTarget(reviewId: string) {
+  const review = await prisma.review.findUnique({
+    where: { id: reviewId },
+    select: {
+      id: true,
+      content: { select: { tmdbId: true, type: true } },
+    },
+  });
+  if (!review) throw new NotFoundError('İnceleme bulunamadı');
+  return review;
 }
 
 // Yorum sorgularına eklenen ortak ilişki: yorumu yazan kullanıcı bilgisi
@@ -304,9 +341,26 @@ export async function listComments(reviewId: string) {
 
 // İncelemeye yeni yorum ekler; gövde küfür filtresinden geçirilip işaretlenir
 export async function createComment(userId: string, reviewId: string, input: CreateCommentInput) {
-  const exists = await prisma.review.findUnique({ where: { id: reviewId }, select: { id: true } });
-  if (!exists) throw new NotFoundError('İnceleme bulunamadı');
-  return prisma.reviewComment.create({
+  const review = await prisma.review.findUnique({
+    where: { id: reviewId },
+    select: { id: true, userId: true },
+  });
+  if (!review) throw new NotFoundError('İnceleme bulunamadı');
+  // İnceleme sahibi ile yorumcu arasında (iki yönden biri) engelleme varsa
+  // yorum yapılamaz — takip/bildirim engeliyle tutarlı davranış.
+  if (review.userId !== userId) {
+    const block = await prisma.block.findFirst({
+      where: {
+        OR: [
+          { blockerId: review.userId, blockedId: userId },
+          { blockerId: userId, blockedId: review.userId },
+        ],
+      },
+      select: { id: true },
+    });
+    if (block) throw new ForbiddenError('Engelleme nedeniyle yorum yapılamaz');
+  }
+  const comment = await prisma.reviewComment.create({
     data: {
       reviewId,
       userId,
@@ -315,6 +369,24 @@ export async function createComment(userId: string, reviewId: string, input: Cre
     },
     include: commentInclude,
   });
+  // İnceleme sahibine yorum bildirimi (kendi yorumu createNotification içinde elenir)
+  await createNotification({
+    recipientId: review.userId,
+    actorId: userId,
+    type: 'REVIEW_COMMENT',
+    entityType: 'review',
+    entityId: reviewId,
+  });
+  // Yorum metnindeki @bahsetmeler için bildirim üret. İnceleme sahibi zaten
+  // REVIEW_COMMENT aldığından mention'da hariç tutulur (çift bildirim önlemi).
+  await notifyMentions({
+    actorId: userId,
+    text: input.body,
+    entityType: 'review',
+    entityId: reviewId,
+    excludeUserIds: [review.userId],
+  });
+  return comment;
 }
 
 // Yorumu günceller; yalnızca yazarı değiştirebilir
@@ -333,10 +405,67 @@ export async function updateComment(
   });
 }
 
+// İncelemeyi raporlar: bir Report kaydı oluşturur (moderasyon kuyruğuna düşer).
+// isFlagged'e bilerek dokunulmaz: herkese görünen "işaretlendi" rozeti yalnızca
+// küfür filtresiyle oluşur; tek bir kullanıcı raporu rozet üretmemeli.
+// Aynı kullanıcının aynı inceleme için tekrar rapor oluşturması engellenir.
+export async function reportReview(userId: string, reviewId: string, input: ReportInput) {
+  const review = await prisma.review.findUnique({ where: { id: reviewId }, select: { id: true } });
+  if (!review) throw new NotFoundError('İnceleme bulunamadı');
+
+  const existing = await prisma.report.findFirst({
+    where: { reporterId: userId, reviewId, status: { in: ['PENDING', 'REVIEWED'] } },
+    select: { id: true },
+  });
+  if (existing) throw new ConflictError('Bu incelemeyi zaten raporladınız');
+
+  await prisma.report.create({
+    data: {
+      reporterId: userId,
+      reviewId,
+      reason: input.reason,
+      description: input.description ?? null,
+    },
+  });
+  return { ok: true };
+}
+
+// Yorumu raporlar: bir Report kaydı oluşturur (isFlagged'e dokunulmaz, bkz. reportReview).
+// Aynı kullanıcının aynı yorum için tekrar rapor oluşturması engellenir.
+export async function reportComment(userId: string, commentId: string, input: ReportInput) {
+  const comment = await prisma.reviewComment.findUnique({
+    where: { id: commentId },
+    select: { id: true },
+  });
+  if (!comment) throw new NotFoundError('Yorum bulunamadı');
+
+  const existing = await prisma.report.findFirst({
+    where: { reporterId: userId, commentId, status: { in: ['PENDING', 'REVIEWED'] } },
+    select: { id: true },
+  });
+  if (existing) throw new ConflictError('Bu yorumu zaten raporladınız');
+
+  await prisma.report.create({
+    data: {
+      reporterId: userId,
+      commentId,
+      reason: input.reason,
+      description: input.description ?? null,
+    },
+  });
+  return { ok: true };
+}
+
 // Yorumu siler; sahibi değilse yalnızca ADMIN silebilir
 export async function deleteComment(userId: string, role: 'USER' | 'ADMIN', commentId: string) {
   const existing = await prisma.reviewComment.findUnique({ where: { id: commentId } });
   if (!existing) throw new NotFoundError('Yorum bulunamadı');
   if (existing.userId !== userId && role !== 'ADMIN') throw new ForbiddenError();
+  // Açık raporlar hedefsiz PENDING kalmasın diye silmeden önce çözülür
+  // (bkz. deleteReview'daki not).
+  await prisma.report.updateMany({
+    where: { commentId, status: { in: ['PENDING', 'REVIEWED'] } },
+    data: { status: 'RESOLVED', resolvedAt: new Date() },
+  });
   await prisma.reviewComment.delete({ where: { id: commentId } });
 }

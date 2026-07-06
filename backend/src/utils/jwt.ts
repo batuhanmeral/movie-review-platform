@@ -2,6 +2,10 @@ import jwt from 'jsonwebtoken';
 import { env } from '../config/env.js';
 import { UnauthorizedError } from './errors.js';
 
+// Token'ları imzalarken yazılan ve doğrulanırken zorunlu tutulan issuer.
+// Başka bir servisin aynı secret ile ürettiği token'lar kabul edilmez.
+export const JWT_ISSUER = 'cinereviews-api';
+
 // Access token içerisine gömülecek veri tipi (Payload)
 export interface AccessTokenPayload {
   sub: string;      // Kullanıcı ID'si
@@ -19,7 +23,7 @@ export interface RefreshTokenPayload {
 export function signAccessToken(payload: AccessTokenPayload): string {
   return jwt.sign(payload, env.JWT_ACCESS_SECRET, {
     expiresIn: env.JWT_ACCESS_TTL,
-    issuer: 'sinefiles-api',
+    issuer: JWT_ISSUER,
   } as jwt.SignOptions);
 }
 
@@ -27,23 +31,27 @@ export function signAccessToken(payload: AccessTokenPayload): string {
 export function signRefreshToken(payload: RefreshTokenPayload): string {
   return jwt.sign(payload, env.JWT_REFRESH_SECRET, {
     expiresIn: env.JWT_REFRESH_TTL,
-    issuer: 'sinefiles-api',
+    issuer: JWT_ISSUER,
   } as jwt.SignOptions);
 }
 
-// Verilen Access Token'ı doğrular ve içindeki verileri döner.
+// Verilen Access Token'ı doğrular (imza + issuer) ve içindeki verileri döner.
 export function verifyAccessToken(token: string): AccessTokenPayload {
   try {
-    return jwt.verify(token, env.JWT_ACCESS_SECRET) as AccessTokenPayload;
+    return jwt.verify(token, env.JWT_ACCESS_SECRET, {
+      issuer: JWT_ISSUER,
+    }) as AccessTokenPayload;
   } catch {
     throw new UnauthorizedError('Geçersiz veya süresi dolmuş token');
   }
 }
 
-// Verilen Refresh Token'ı doğrular ve içindeki verileri döner
+// Verilen Refresh Token'ı doğrular (imza + issuer) ve içindeki verileri döner
 export function verifyRefreshToken(token: string): RefreshTokenPayload {
   try {
-    return jwt.verify(token, env.JWT_REFRESH_SECRET) as RefreshTokenPayload;
+    return jwt.verify(token, env.JWT_REFRESH_SECRET, {
+      issuer: JWT_ISSUER,
+    }) as RefreshTokenPayload;
   } catch {
     throw new UnauthorizedError('Refresh token geçersiz veya süresi dolmuş');
   }

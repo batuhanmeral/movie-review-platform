@@ -1,4 +1,4 @@
-// SineFiles - Prisma Schema
+// CineReviews - Prisma Schema
 // Veritabanı: PostgreSQL
 // ORM: Prisma
 
@@ -46,6 +46,7 @@ enum NotificationType {
   REVIEW_COMMENT
   LIST_LIKE
   MENTION
+  ADMIN_ANNOUNCEMENT
 }
 
 enum ReportStatus {
@@ -191,6 +192,7 @@ model ReviewComment {
 
   review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reports Report[]
 
   @@index([reviewId])
 }
@@ -281,6 +283,10 @@ model Notification {
   type        NotificationType
   entityType  String?          // "review" | "list" | "user" gibi
   entityId    String?
+  // Serbest metin: özellikle ADMIN_ANNOUNCEMENT bildirimleri için başlık/gövde.
+  // Etkileşim bildirimlerinde (beğeni/takip/yorum) genelde boş bırakılır.
+  title       String?
+  body        String?          @db.Text
   isRead      Boolean          @default(false)
   createdAt   DateTime         @default(now())
 
@@ -312,14 +318,16 @@ model Report {
   id          String       @id @default(uuid())
   reporterId  String
   reviewId    String?
+  commentId   String?
   reason      String
   description String?      @db.Text
   status      ReportStatus @default(PENDING)
   createdAt   DateTime     @default(now())
   resolvedAt  DateTime?
 
-  reporter User    @relation("Reporter", fields: [reporterId], references: [id], onDelete: Cascade)
-  review   Review? @relation(fields: [reviewId], references: [id], onDelete: SetNull)
+  reporter User           @relation("Reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  review   Review?        @relation(fields: [reviewId], references: [id], onDelete: SetNull)
+  comment  ReviewComment? @relation(fields: [commentId], references: [id], onDelete: SetNull)
 
   @@index([status])
 }
