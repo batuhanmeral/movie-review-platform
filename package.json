@@ -1,9 +1,10 @@
 {
-  "name": "sinefiles",
+  "name": "movie-tv-review",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
-  "description": "Social film/series review platform powered by TMDB.",
+  "description": "CineReviews — social film/series review platform powered by TMDB.",
   "packageManager": "pnpm@9.12.0",
   "engines": {
     "node": ">=20"
@@ -12,6 +13,7 @@
     "dev:backend": "pnpm --filter ./backend dev",
     "dev:frontend": "pnpm --filter ./frontend dev",
     "build": "pnpm -r build",
+    "test": "pnpm -r test",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },

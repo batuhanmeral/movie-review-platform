@@ -8,5 +8,5 @@ export const logger = pino({
     env.NODE_ENV === 'development'
       ? { target: 'pino-pretty', options: { colorize: true, translateTime: 'SYS:HH:MM:ss' } }
       : undefined,
-  base: { service: 'sinefiles-api' }, // Loglara otomatik eklenecek temel bilgiler
+  base: { service: 'cinereviews-api' }, // Loglara otomatik eklenecek temel bilgiler
 });

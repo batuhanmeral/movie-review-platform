@@ -101,7 +101,7 @@ export const useAuthStore = create<AuthState>()(
       setUser: (user) => set({ user }),
     }),
     {
-      name: 'sf-auth', // localStorage anahtarı
+      name: 'cr-auth', // localStorage anahtarı
       // Sadece gerekli alanları kalıcı olarak sakla (fonksiyonlar hariç)
       partialize: (s) => ({
         accessToken: s.accessToken,
@@ -111,3 +111,9 @@ export const useAuthStore = create<AuthState>()(
     },
   ),
 );
+
+// SineFiles → CineReviews geçişinden kalan eski oturum anahtarını temizle;
+// içindeki token'lar eski issuer ile imzalandığından zaten kullanılamaz.
+if (typeof window !== 'undefined') {
+  window.localStorage.removeItem('sf-auth');
+}
