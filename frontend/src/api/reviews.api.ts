@@ -79,6 +79,23 @@ export const reviewsApi = {
     return data;
   },
 
+  report: async (id: string, reason: string, description?: string): Promise<void> => {
+    await apiClient.post(`/reviews/${id}/report`, { reason, description });
+  },
+
+  // İncelemenin bağlı olduğu içeriğin adresi (/review/:id yönlendirmesi için)
+  target: async (id: string): Promise<{ id: string; content: { tmdbId: number; type: 'MOVIE' | 'TV' } }> => {
+    const { data } = await apiClient.get<{
+      id: string;
+      content: { tmdbId: number; type: 'MOVIE' | 'TV' };
+    }>(`/reviews/${id}/target`);
+    return data;
+  },
+
+  reportComment: async (commentId: string, reason: string, description?: string): Promise<void> => {
+    await apiClient.post(`/reviews/comments/${commentId}/report`, { reason, description });
+  },
+
   listComments: async (reviewId: string): Promise<ReviewComment[]> => {
     const { data } = await apiClient.get<ReviewComment[]>(`/reviews/${reviewId}/comments`);
     return data;

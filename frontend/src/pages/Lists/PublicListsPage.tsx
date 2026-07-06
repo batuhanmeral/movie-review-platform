@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { listsApi } from '@/api/lists.api';
 import { PopularListCard } from '@/features/list/PopularListCard';
+import { EmptyState } from '@/components/common/EmptyState';
 import { useAuthStore } from '@/features/auth/authStore';
 
 // Herkese açık popüler listeleri grid olarak gösteren sayfa (/lists).
@@ -56,15 +57,12 @@ export default function PublicListsPage() {
         </div>
 
         {!lists || lists.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-white/10 bg-surface-raised p-12 text-center">
-            <p className="mb-4 text-lg text-ink-muted">{t('lists.empty')}</p>
-            <Link
-              to="/discover"
-              className="inline-block rounded-lg bg-accent px-6 py-3 font-semibold text-surface transition-colors hover:bg-accent/90"
-            >
-              {t('discover.title')}
-            </Link>
-          </div>
+          <EmptyState
+            icon="🎬"
+            title={t('lists.empty')}
+            actionLabel={t('discover.title')}
+            actionTo="/discover"
+          />
         ) : (
           <>
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

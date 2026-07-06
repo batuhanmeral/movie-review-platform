@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { reviewsApi } from '@/api/reviews.api';
+import { apiErrorMessage } from '@/lib/apiError';
 import { useAuthStore } from '@/features/auth/authStore';
 import type { ReviewComment } from '@/types/review';
 
@@ -41,6 +42,17 @@ export function CommentThread({ reviewId }: Props) {
     },
   });
 
+  const report = useMutation({
+    mutationFn: (v: { id: string; reason: string }) => reviewsApi.reportComment(v.id, v.reason),
+    onSuccess: () => window.alert(t('reviews.reported')),
+    onError: (err) => window.alert(apiErrorMessage(err, t('reviews.reportFailed'))),
+  });
+
+  const handleReport = (id: string) => {
+    const reason = window.prompt(t('reviews.reportCommentPrompt'));
+    if (reason && reason.trim()) report.mutate({ id, reason: reason.trim() });
+  };
+
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const body = text.trim();
@@ -67,15 +79,26 @@ export function CommentThread({ reviewId }: Props) {
                   <time className="text-ink-muted">
                     {new Date(c.createdAt).toLocaleDateString()}
                   </time>
-                  {(me?.id === c.user.id || me?.role === 'ADMIN') && (
-                    <button
-                      type="button"
-                      onClick={() => remove.mutate(c.id)}
-                      className="ml-auto text-ink-muted hover:text-rating-low"
-                    >
-                      {t('reviews.comments.delete')}
-                    </button>
-                  )}
+                  <span className="ml-auto flex items-center gap-2">
+                    {me && me.id !== c.user.id && me.role !== 'ADMIN' && (
+                      <button
+                        type="button"
+                        onClick={() => handleReport(c.id)}
+                        className="text-ink-dim hover:text-rating-low"
+                      >
+                        {t('reviews.report')}
+                      </button>
+                    )}
+                    {(me?.id === c.user.id || me?.role === 'ADMIN') && (
+                      <button
+                        type="button"
+                        onClick={() => remove.mutate(c.id)}
+                        className="text-ink-muted hover:text-rating-low"
+                      >
+                        {t('reviews.comments.delete')}
+                      </button>
+                    )}
+                  </span>
                 </div>
                 <p className="mt-0.5 text-ink/90 whitespace-pre-wrap break-words">{c.body}</p>
               </div>

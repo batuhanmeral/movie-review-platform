@@ -15,7 +15,8 @@
     "profileMenu": "Profil menüsü",
     "viewProfile": "Profilim",
     "myLists": "Listelerim",
-    "settings": "Ayarlar"
+    "settings": "Ayarlar",
+    "adminPanel": "Admin Paneli"
   },
   "auth": {
     "login": "Giriş Yap",
@@ -125,6 +126,9 @@
   "profile": {
     "follow": "Takip et",
     "unfollow": "Takibi bırak",
+    "block": "Engelle",
+    "unblock": "Engeli kaldır",
+    "blockConfirm": "{{name}} engellensin mi? Karşılıklı takipler kaldırılır.",
     "editProfile": "Profilimi düzenle",
     "watched": "İzlenenler",
     "reviews": "İnceleme",
@@ -226,6 +230,9 @@
     "languageHelp": "Arayüz dili değişimi anında uygulanır ve hesabına kaydedilir.",
     "saving": "kaydediliyor…",
     "saveError": "Kayıt başarısız",
+    "blocked": "Engellenen Kullanıcılar",
+    "blockedHelp": "Engellediğin kişiler seni takip edemez, sana bildirim gönderemez ve incelemelerine yorum yapamaz.",
+    "blockedEmpty": "Henüz kimseyi engellemedin.",
     "dangerZone": "Tehlikeli alan",
     "deleteHelp": "Hesabını ve tüm verilerini kalıcı olarak siler. Bu işlem geri alınamaz.",
     "deleteAccount": "Hesabımı sil",
@@ -245,6 +252,11 @@
     "spoilerHidden": "⚠ Spoiler içeriyor — göstermek için tıkla",
     "flagged": "işaretlendi",
     "like": "Beğen",
+    "report": "Bildir",
+    "reportPrompt": "Bu incelemeyi neden bildiriyorsun?",
+    "reportCommentPrompt": "Bu yorumu neden bildiriyorsun?",
+    "reported": "Bildirildi. Teşekkürler.",
+    "reportFailed": "Bildirme başarısız oldu",
     "form": {
       "writeTitle": "İnceleme yaz",
       "editTitle": "İncelemeni güncelle",
@@ -313,6 +325,23 @@
     "friends": {
       "title": "Takip Ettiklerim",
       "subtitle": "Takip ettiğin kişiler"
+    }
+  },
+  "notifications": {
+    "title": "Bildirimler",
+    "empty": "Henüz bildirimin yok",
+    "loading": "Yükleniyor…",
+    "markAllRead": "Tümünü okundu işaretle",
+    "viewAll": "Tümünü gör",
+    "loadMore": "Daha fazla yükle",
+    "someone": "Birisi",
+    "msg": {
+      "newFollower": "{{name}} seni takip etmeye başladı",
+      "reviewLike": "{{name}} incelemeni beğendi",
+      "reviewComment": "{{name}} incelemene yorum yaptı",
+      "listLike": "{{name}} listeni beğendi",
+      "mention": "{{name}} senden bahsetti",
+      "announcement": "Yeni duyuru"
     }
   },
   "footer": {

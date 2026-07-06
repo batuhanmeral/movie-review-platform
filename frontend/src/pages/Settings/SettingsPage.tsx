@@ -1,6 +1,7 @@
 import { useRef, useState, type ChangeEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { useAuthStore } from '@/features/auth/authStore';
 import { useThemeStore, type Theme } from '@/features/theme/themeStore';
@@ -70,6 +71,8 @@ export default function SettingsPage() {
       </div>
       {/* Şifre değiştirme kartı */}
       <PasswordCard />
+      {/* Engellenen kullanıcılar */}
+      <BlockedCard />
       {/* Tehlikeli bölge: hesap silme */}
       <DangerCard
         onDeleted={() => {
@@ -273,6 +276,61 @@ export default function SettingsPage() {
       </section>
     );
   }
+}
+
+// Engellenen kullanıcılar kartı — listeler ve engeli kaldırma imkanı verir
+function BlockedCard() {
+  const { t } = useTranslation();
+  const qc = useQueryClient();
+  const { data: blocked = [], isLoading } = useQuery({
+    queryKey: ['my-blocks'],
+    queryFn: usersApi.blocks,
+  });
+
+  const unblock = useMutation({
+    mutationFn: (username: string) => usersApi.unblock(username),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ['my-blocks'] }),
+  });
+
+  return (
+    <section className="card">
+      <h2 className="text-base font-semibold text-ink">{t('settings.blocked')}</h2>
+      <p className="mt-1 text-sm text-ink-muted">{t('settings.blockedHelp')}</p>
+      {isLoading ? (
+        <p className="mt-3 text-sm text-ink-muted">{t('notifications.loading')}</p>
+      ) : blocked.length === 0 ? (
+        <p className="mt-3 text-sm text-ink-muted">{t('settings.blockedEmpty')}</p>
+      ) : (
+        <ul className="mt-3 divide-y divide-white/5">
+          {blocked.map((u) => (
+            <li key={u.id} className="flex items-center justify-between py-2.5">
+              <Link to={`/u/${u.username}`} className="flex items-center gap-3 hover:text-accent">
+                {u.avatarUrl ? (
+                  <img src={u.avatarUrl} alt="" className="h-8 w-8 rounded-full object-cover" />
+                ) : (
+                  <div className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-accent to-accent-cyan text-xs font-semibold text-surface">
+                    {(u.displayName ?? u.username).charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div className="text-sm">
+                  <div className="font-medium text-ink">{u.displayName ?? u.username}</div>
+                  <div className="text-xs text-ink-muted">@{u.username}</div>
+                </div>
+              </Link>
+              <button
+                type="button"
+                onClick={() => unblock.mutate(u.username)}
+                disabled={unblock.isPending}
+                className="btn-outline px-3 py-1 text-xs disabled:opacity-60"
+              >
+                {t('profile.unblock')}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
 }
 
 // Tema (açık/koyu) tercihi kartı — anında uygulanır ve localStorage'da saklanır
