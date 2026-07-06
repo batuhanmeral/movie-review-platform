@@ -125,6 +125,41 @@ export const unfollowUserHandler: RequestHandler = async (req, res, next) => {
   }
 };
 
+// Bir kullanıcıyı engeller
+export const blockUserHandler: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.auth) throw new UnauthorizedError();
+    const username = (req.params.username ?? '').toLowerCase();
+    const result = await service.blockUser(req.auth.sub, username);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Engellemeyi kaldırır
+export const unblockUserHandler: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.auth) throw new UnauthorizedError();
+    const username = (req.params.username ?? '').toLowerCase();
+    const result = await service.unblockUser(req.auth.sub, username);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// İzleyicinin engellediği kullanıcıları listeler
+export const listMyBlocksHandler: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.auth) throw new UnauthorizedError();
+    const result = await service.listMyBlocks(req.auth.sub);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
 // Kullanıcının favorilerini TMDB metaverisiyle zenginleştirip döner
 export const getFavoritesHandler: RequestHandler = async (req, res, next) => {
   try {

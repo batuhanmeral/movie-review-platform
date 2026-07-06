@@ -39,8 +39,15 @@ export const updateCommentSchema = z.object({
   body: z.string().min(1).max(2000),
 });
 
+// Raporlama gövdesi — hem inceleme hem yorum raporları için kullanılır
+export const reportSchema = z.object({
+  reason: z.string().trim().min(1, 'Sebep gerekli').max(120),
+  description: z.string().trim().max(1000).optional(),
+});
+
 export type CreateReviewInput = z.infer<typeof createReviewSchema>;
 export type UpdateReviewInput = z.infer<typeof updateReviewSchema>;
 export type ListReviewsQuery = z.infer<typeof listReviewsQuerySchema>;
 export type CreateCommentInput = z.infer<typeof createCommentSchema>;
 export type UpdateCommentInput = z.infer<typeof updateCommentSchema>;
+export type ReportInput = z.infer<typeof reportSchema>;

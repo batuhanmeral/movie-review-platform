@@ -1,10 +1,14 @@
 import type { RequestHandler } from 'express';
+import { prisma } from '../config/db.js';
 import { verifyAccessToken, type AccessTokenPayload } from '../utils/jwt.js';
 import { ForbiddenError, UnauthorizedError } from '../utils/errors.js';
 
 // Kullanıcının giriş yapıp yapmadığını (Token geçerliliğini) kontrol eden middleware
-// Geçerli bir Bearer token bulunursa kullanıcı bilgilerini req.auth içine ekler
-export const requireAuth: RequestHandler = (req, _res, next) => {
+// Geçerli bir Bearer token bulunursa kullanıcı bilgilerini req.auth içine ekler.
+// Token geçerli olsa bile hesabın güncel durumu DB'den doğrulanır: silinen
+// kullanıcı ve askıya alınan hesap, access token süresi dolmadan anında
+// dışarıda bırakılır; rol değişikliği de token beklenmeden uygulanır.
+export const requireAuth: RequestHandler = async (req, _res, next) => {
   const header = req.headers.authorization;
   // Authorization header yoksa veya Bearer ile başlamıyorsa hata fırlat
   if (!header?.startsWith('Bearer ')) {
@@ -12,8 +16,14 @@ export const requireAuth: RequestHandler = (req, _res, next) => {
   }
   const token = header.slice(7); // "Bearer " kısmını at
   try {
-    // Token'ı doğrula ve payload'ı req.auth içine ekle
-    req.auth = verifyAccessToken(token);
+    const payload = verifyAccessToken(token);
+    const user = await prisma.user.findUnique({
+      where: { id: payload.sub },
+      select: { role: true, isSuspended: true },
+    });
+    if (!user) throw new UnauthorizedError('Kullanıcı bulunamadı');
+    if (user.isSuspended) throw new ForbiddenError('Hesap askıya alınmış');
+    req.auth = { ...payload, role: user.role };
     next();
   } catch (err) {
     next(err);

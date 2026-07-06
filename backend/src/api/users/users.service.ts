@@ -3,9 +3,10 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '../../config/db.js';
 import { env } from '../../config/env.js';
 import { hashPassword, verifyPassword } from '../../utils/password.js';
-import { BadRequestError, ConflictError, NotFoundError } from '../../utils/errors.js';
+import { BadRequestError, ConflictError, ForbiddenError, NotFoundError } from '../../utils/errors.js';
 import * as tmdb from '../../services/tmdb.service.js';
 import { listReviewsByUser } from '../reviews/reviews.service.js';
+import { createNotification } from '../notifications/notifications.service.js';
 import type { UpdateMeInput } from './users.validator.js';
 
 // "Kendi profilim" yanıtında dönen alanlar (passwordHash gibi hassas alanlar hariç)
@@ -116,15 +117,23 @@ export async function getByUsername(username: string, viewerId?: string) {
   if (!user) throw new NotFoundError('Kullanıcı bulunamadı');
 
   let isFollowing = false;
+  let isBlocked = false;
   if (viewerId && viewerId !== user.id) {
-    const follow = await prisma.follow.findUnique({
-      where: { followerId_followingId: { followerId: viewerId, followingId: user.id } },
-      select: { id: true },
-    });
+    const [follow, block] = await Promise.all([
+      prisma.follow.findUnique({
+        where: { followerId_followingId: { followerId: viewerId, followingId: user.id } },
+        select: { id: true },
+      }),
+      prisma.block.findUnique({
+        where: { blockerId_blockedId: { blockerId: viewerId, blockedId: user.id } },
+        select: { id: true },
+      }),
+    ]);
     isFollowing = Boolean(follow);
+    isBlocked = Boolean(block);
   }
 
-  return { ...user, isFollowing };
+  return { ...user, isFollowing, isBlocked };
 }
 
 // Bir kullanıcının takipçilerini ('followers') veya takip ettiklerini ('following') listeler.
@@ -190,15 +199,41 @@ export async function followUser(viewerId: string, username: string) {
   if (!target) throw new NotFoundError('Kullanıcı bulunamadı');
   if (target.id === viewerId) throw new BadRequestError('Kendinizi takip edemezsiniz');
 
+  // İki taraftan biri diğerini engellemişse takip engellenir
+  const block = await prisma.block.findFirst({
+    where: {
+      OR: [
+        { blockerId: viewerId, blockedId: target.id },
+        { blockerId: target.id, blockedId: viewerId },
+      ],
+    },
+    select: { id: true },
+  });
+  if (block) throw new ForbiddenError('Engelleme nedeniyle takip edilemez');
+
+  let created = true;
   try {
     await prisma.follow.create({
       data: { followerId: viewerId, followingId: target.id },
     });
   } catch (err) {
     // Zaten takip ediliyorsa (unique ihlali) sessizce geç — istek idempotenttir
-    if (!(err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002')) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+      created = false;
+    } else {
       throw err;
     }
+  }
+
+  // Yalnızca yeni bir takip oluştuysa bildirim üret (tekrarlı isteklerde değil)
+  if (created) {
+    await createNotification({
+      recipientId: target.id,
+      actorId: viewerId,
+      type: 'NEW_FOLLOWER',
+      entityType: 'user',
+      entityId: viewerId,
+    });
   }
 
   const followerCount = await prisma.follow.count({ where: { followingId: target.id } });
@@ -219,6 +254,53 @@ export async function unfollowUser(viewerId: string, username: string) {
 
   const followerCount = await prisma.follow.count({ where: { followingId: target.id } });
   return { following: false, followerCount };
+}
+
+// Bir kullanıcıyı engeller. İdempotenttir. Engelleme, iki yöndeki takip
+// ilişkilerini de kaldırır (artık birbirlerini takip edemezler).
+export async function blockUser(viewerId: string, username: string) {
+  const target = await prisma.user.findUnique({ where: { username }, select: { id: true } });
+  if (!target) throw new NotFoundError('Kullanıcı bulunamadı');
+  if (target.id === viewerId) throw new BadRequestError('Kendinizi engelleyemezsiniz');
+
+  try {
+    await prisma.block.create({ data: { blockerId: viewerId, blockedId: target.id } });
+  } catch (err) {
+    // Zaten engelliyse (unique ihlali) sessizce geç
+    if (!(err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002')) throw err;
+  }
+
+  // Karşılıklı takipleri kaldır
+  await prisma.follow.deleteMany({
+    where: {
+      OR: [
+        { followerId: viewerId, followingId: target.id },
+        { followerId: target.id, followingId: viewerId },
+      ],
+    },
+  });
+
+  return { blocked: true };
+}
+
+// Engellemeyi kaldırır. İdempotenttir.
+export async function unblockUser(viewerId: string, username: string) {
+  const target = await prisma.user.findUnique({ where: { username }, select: { id: true } });
+  if (!target) throw new NotFoundError('Kullanıcı bulunamadı');
+  await prisma.block.deleteMany({ where: { blockerId: viewerId, blockedId: target.id } });
+  return { blocked: false };
+}
+
+// İzleyicinin engellediği kullanıcıları listeler (Ayarlar sayfası için).
+export async function listMyBlocks(viewerId: string) {
+  const rows = await prisma.block.findMany({
+    where: { blockerId: viewerId },
+    orderBy: { createdAt: 'desc' },
+    select: {
+      blocked: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+    },
+  });
+  return rows.map((r) => r.blocked);
 }
 
 // Favori içerik referansının şekli (DB'de Json olarak saklanır)

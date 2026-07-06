@@ -3,6 +3,7 @@ import { prisma } from '../../config/db.js';
 import { ConflictError, ForbiddenError, NotFoundError } from '../../utils/errors.js';
 import * as tmdb from '../../services/tmdb.service.js';
 import { getDetail } from '../content/content.service.js';
+import { createNotification } from '../notifications/notifications.service.js';
 import type {
   AddItemInput,
   CreateListInput,
@@ -171,6 +172,14 @@ export async function toggleListLike(userId: string, listId: string) {
     await prisma.listLike.delete({ where: { id: existing.id } });
   } else {
     await prisma.listLike.create({ data: { listId, userId } });
+    // Liste sahibine beğeni bildirimi (kendi beğenisi createNotification içinde elenir)
+    await createNotification({
+      recipientId: list.userId,
+      actorId: userId,
+      type: 'LIST_LIKE',
+      entityType: 'list',
+      entityId: listId,
+    });
   }
 
   const likeCount = await prisma.listLike.count({ where: { listId } });

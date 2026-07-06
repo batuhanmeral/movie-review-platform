@@ -103,6 +103,41 @@ export const toggleLikeHandler: RequestHandler = async (req, res, next) => {
   }
 };
 
+// İncelemeyi raporlar (moderasyon kuyruğuna düşer)
+export const reportReviewHandler: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.auth) throw new UnauthorizedError();
+    const id = req.params.id as string;
+    const result = await service.reportReview(req.auth.sub, id, req.body);
+    res.status(201).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Yorumu raporlar (moderasyon kuyruğuna düşer)
+export const reportCommentHandler: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.auth) throw new UnauthorizedError();
+    const commentId = req.params.commentId as string;
+    const result = await service.reportComment(req.auth.sub, commentId, req.body);
+    res.status(201).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// İncelemenin bağlı olduğu içeriğin adresini döner (bildirim yönlendirmesi)
+export const getReviewTargetHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const id = req.params.id as string;
+    const result = await service.getReviewTarget(id);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
 // İncelemeye ait yorumları (eskiden yeniye) listeler
 export const listCommentsHandler: RequestHandler = async (req, res, next) => {
   try {
