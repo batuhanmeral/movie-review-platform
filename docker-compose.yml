@@ -1,29 +1,28 @@
+# Compose proje adı sabit: container/volume adları klasör adından bağımsız kalır
+name: cinephiles
+
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: cinereviews-postgres
+    container_name: cinephiles-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: cinereviews
-      POSTGRES_PASSWORD: cinereviews
-      POSTGRES_DB: cinereviews
+      POSTGRES_USER: cinephiles
+      POSTGRES_PASSWORD: cinephiles
+      POSTGRES_DB: cinephiles
     ports:
       - '5433:5432'
     volumes:
-      # Not: sinefiles → cinereviews geçişinde POSTGRES_USER/DB yalnızca ilk
-      # başlatmada uygulandığından eski "postgres_data" volume'ü yeni kimlik
-      # bilgileriyle uyumsuz kaldı; taze init için volume adı değiştirildi.
-      # Eski veriyi temizlemek için: docker volume rm movie-tv-review_postgres_data
-      - postgres_data_cinereviews:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U cinereviews -d cinereviews']
+      test: ['CMD-SHELL', 'pg_isready -U cinephiles -d cinephiles']
       interval: 10s
       timeout: 5s
       retries: 5
 
   redis:
     image: redis:7-alpine
-    container_name: cinereviews-redis
+    container_name: cinephiles-redis
     restart: unless-stopped
     ports:
       - '6379:6379'
@@ -36,5 +35,5 @@ services:
       retries: 5
 
 volumes:
-  postgres_data_cinereviews:
+  postgres_data:
   redis_data:

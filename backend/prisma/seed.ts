@@ -12,7 +12,7 @@ import bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 // ---------------------------------------------------------------------------
-// CineReviews geliştirme seed'i
+// Cinephiles geliştirme seed'i
 // ---------------------------------------------------------------------------
 // Uygulamayı gerçekçi göstermek için kullanıcı, içerik, inceleme, takip,
 // beğeni, yorum, liste ve bildirim verisi üretir (her birinden 30+).
@@ -52,10 +52,10 @@ async function main() {
 
   // -- ADMIN & DEMO (mevcut davranış korunur) --------------------------------
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@cinereviews.dev' },
+    where: { email: 'admin@cinephiles.dev' },
     update: {},
     create: {
-      email: 'admin@cinereviews.dev',
+      email: 'admin@cinephiles.dev',
       username: 'admin',
       passwordHash: adminHash,
       displayName: 'Admin',
@@ -65,10 +65,10 @@ async function main() {
   });
 
   const demo = await prisma.user.upsert({
-    where: { email: 'demo@cinereviews.dev' },
+    where: { email: 'demo@cinephiles.dev' },
     update: {},
     create: {
-      email: 'demo@cinereviews.dev',
+      email: 'demo@cinephiles.dev',
       username: 'demo',
       passwordHash: userHash,
       displayName: 'Demo Kullanıcı',
@@ -115,10 +115,10 @@ async function main() {
   const users = [];
   for (const u of userSeed) {
     const user = await prisma.user.upsert({
-      where: { email: `${u.username}@cinereviews.dev` },
+      where: { email: `${u.username}@cinephiles.dev` },
       update: {},
       create: {
-        email: `${u.username}@cinereviews.dev`,
+        email: `${u.username}@cinephiles.dev`,
         username: u.username,
         passwordHash: userHash,
         displayName: u.displayName,

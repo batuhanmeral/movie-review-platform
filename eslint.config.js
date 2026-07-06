@@ -1,4 +1,4 @@
-// CineReviews monorepo ESLint yapılandırması (ESLint 9 "flat config").
+// Cinephiles monorepo ESLint yapılandırması (ESLint 9 "flat config").
 // Tek kökten hem frontend (Vite + React) hem backend (Express + Node) lint'lenir.
 // Çalıştırma: `pnpm lint`  (otomatik düzeltme: `pnpm lint:fix`)
 import js from '@eslint/js';

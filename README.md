@@ -1,8 +1,8 @@
-# CineReviews
+# Cinephiles
 
 > Social film & TV review platform — a TMDB-powered, full-stack cinema community.
 
-CineReviews is a social cinema platform where users discover, rate and review
+Cinephiles is a social cinema platform where users discover, rate and review
 movies and TV shows, build collection lists, follow other users and engage with
 the community.
 
@@ -39,7 +39,7 @@ the community.
 ## Project Structure
 
 ```
-movie-tv-review/
+cinephiles/
 ├── backend/                 # Express REST API
 │   ├── prisma/              # Schema, migrations and seed script
 │   └── src/

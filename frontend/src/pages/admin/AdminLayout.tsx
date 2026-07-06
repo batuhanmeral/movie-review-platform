@@ -27,7 +27,7 @@ export function AdminLayout() {
               CINE
             </span>
             <span className="bg-gradient-to-r from-cyan-400 to-emerald-500 bg-clip-text text-transparent">
-              REVIEWS
+              PHILES
             </span>
           </Link>
           <p className="mt-0.5 text-xs text-ink-muted">Yönetim Paneli</p>

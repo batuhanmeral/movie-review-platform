@@ -101,7 +101,7 @@ export const useAuthStore = create<AuthState>()(
       setUser: (user) => set({ user }),
     }),
     {
-      name: 'cr-auth', // localStorage anahtarı
+      name: 'cp-auth', // localStorage anahtarı
       // Sadece gerekli alanları kalıcı olarak sakla (fonksiyonlar hariç)
       partialize: (s) => ({
         accessToken: s.accessToken,
@@ -112,8 +112,9 @@ export const useAuthStore = create<AuthState>()(
   ),
 );
 
-// SineFiles → CineReviews geçişinden kalan eski oturum anahtarını temizle;
-// içindeki token'lar eski issuer ile imzalandığından zaten kullanılamaz.
+// Önceki markalardan (SineFiles, CineReviews) kalan eski oturum anahtarlarını
+// temizle; içlerindeki token'lar eski issuer ile imzalandığından kullanılamaz.
 if (typeof window !== 'undefined') {
   window.localStorage.removeItem('sf-auth');
+  window.localStorage.removeItem('cr-auth');
 }
