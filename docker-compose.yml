@@ -1,25 +1,29 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: sinefiles-postgres
+    container_name: cinereviews-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: sinefiles
-      POSTGRES_PASSWORD: sinefiles
-      POSTGRES_DB: sinefiles
+      POSTGRES_USER: cinereviews
+      POSTGRES_PASSWORD: cinereviews
+      POSTGRES_DB: cinereviews
     ports:
       - '5433:5432'
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      # Not: sinefiles → cinereviews geçişinde POSTGRES_USER/DB yalnızca ilk
+      # başlatmada uygulandığından eski "postgres_data" volume'ü yeni kimlik
+      # bilgileriyle uyumsuz kaldı; taze init için volume adı değiştirildi.
+      # Eski veriyi temizlemek için: docker volume rm movie-tv-review_postgres_data
+      - postgres_data_cinereviews:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U sinefiles -d sinefiles']
+      test: ['CMD-SHELL', 'pg_isready -U cinereviews -d cinereviews']
       interval: 10s
       timeout: 5s
       retries: 5
 
   redis:
     image: redis:7-alpine
-    container_name: sinefiles-redis
+    container_name: cinereviews-redis
     restart: unless-stopped
     ports:
       - '6379:6379'
@@ -32,5 +36,5 @@ services:
       retries: 5
 
 volumes:
-  postgres_data:
+  postgres_data_cinereviews:
   redis_data:
