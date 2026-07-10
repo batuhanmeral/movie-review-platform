@@ -66,13 +66,6 @@ export default function FeedPage() {
 
       {/* ORTA — akış */}
       <div className="w-full max-w-2xl">
-        <header className="mb-5">
-          <h1 className="font-display text-2xl font-extrabold text-ink sm:text-3xl">
-            {t('feed.title')}
-          </h1>
-          <p className="mt-1 text-sm text-ink-muted">{t('feed.subtitle')}</p>
-        </header>
-
         {/* Mobil/tablet filtre çubuğu */}
         <div className="mb-5 lg:hidden">
           <MobileFeedBar

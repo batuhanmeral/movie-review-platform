@@ -57,7 +57,7 @@ export function PopularListCard({ list, to }: Props) {
   );
 
   return (
-    <article className="card w-full rounded-2xl">
+    <article className="card-hover w-full rounded-2xl">
       {to ? (
         <Link to={to} className="block transition-opacity hover:opacity-90">
           {head}

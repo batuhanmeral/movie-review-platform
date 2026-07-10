@@ -141,17 +141,10 @@ export default function DiscoverPage() {
       <FilterPanel values={filters} onChange={setFilters} genres={genresQuery.data ?? []} />
 
       <div className="space-y-8">
-        {/* Sayfa başlığı ve arama durumu bilgisi */}
-        <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="font-display text-2xl font-bold text-ink">{t('discover.title')}</h1>
-            <p className="text-sm text-ink-muted">
-              {isSearching
-                ? t('discover.searchingFor', { q: debouncedQuery })
-                : t('discover.subtitle')}
-            </p>
-          </div>
-        </header>
+        {/* Arama yapılırken aranan sorguyu göster */}
+        {isSearching && (
+          <p className="text-sm text-ink-muted">{t('discover.searchingFor', { q: debouncedQuery })}</p>
+        )}
 
         {/* Kişiler/Kullanıcılar kapsamı seçili ama arama yapılmadıysa ipucu */}
         {needsQuery && (

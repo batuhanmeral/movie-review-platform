@@ -64,7 +64,7 @@ export function FeedReviewCard({ review }: Props) {
   };
 
   return (
-    <article className="card animate-lift-in space-y-3 transition-all duration-300 hover:shadow-glow hover:ring-accent/20">
+    <article className="card-hover animate-lift-in space-y-3">
       {/* HEADER — kullanıcı bilgisi + aksiyon menüsü */}
       <header className="flex items-center gap-3">
         <Link to={profileHref} className="shrink-0">

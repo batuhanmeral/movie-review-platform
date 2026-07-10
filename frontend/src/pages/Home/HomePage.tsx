@@ -190,7 +190,7 @@ function FeaturedHero({ item, onNext, onPrev }: { item: ContentItem; onNext: () 
         <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 sm:py-14 md:grid-cols-[220px,1fr] md:items-center">
           {/* Poster */}
           {posterUrl ? (
-            <img src={posterUrl} alt={item.title} className="aspect-[2/3] w-full max-w-[220px] rounded-xl shadow-card ring-1 ring-white/10" />
+            <img src={posterUrl} alt={item.title} className="aspect-[2/3] w-full max-w-[220px] rounded-xl ring-1 ring-white/10" />
           ) : (
             <div className="aspect-[2/3] w-full max-w-[220px] rounded-xl bg-surface-muted" />
           )}

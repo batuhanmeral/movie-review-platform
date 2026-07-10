@@ -13,7 +13,7 @@ export function PopularReviewCard({ review }: Props) {
   const detailHref = `/${review.content.type === 'MOVIE' ? 'movie' : 'tv'}/${review.content.tmdbId}`;
 
   return (
-    <article className="card flex w-72 shrink-0 snap-start gap-3 sm:w-80">
+    <article className="card-hover flex w-72 shrink-0 snap-start gap-3 sm:w-80">
       <Link to={detailHref} className="shrink-0">
         {posterUrl ? (
           <img
