@@ -52,10 +52,10 @@ async function main() {
 
   // -- ADMIN & DEMO (mevcut davranış korunur) --------------------------------
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@cinephiles.dev' },
+    where: { email: 'admin@movie-review-platform.dev' },
     update: {},
     create: {
-      email: 'admin@cinephiles.dev',
+      email: 'admin@movie-review-platform.dev',
       username: 'admin',
       passwordHash: adminHash,
       displayName: 'Admin',
@@ -65,10 +65,10 @@ async function main() {
   });
 
   const demo = await prisma.user.upsert({
-    where: { email: 'demo@cinephiles.dev' },
+    where: { email: 'demo@movie-review-platform.dev' },
     update: {},
     create: {
-      email: 'demo@cinephiles.dev',
+      email: 'demo@movie-review-platform.dev',
       username: 'demo',
       passwordHash: userHash,
       displayName: 'Demo Kullanıcı',
@@ -115,10 +115,10 @@ async function main() {
   const users = [];
   for (const u of userSeed) {
     const user = await prisma.user.upsert({
-      where: { email: `${u.username}@cinephiles.dev` },
+      where: { email: `${u.username}@movie-review-platform.dev` },
       update: {},
       create: {
-        email: `${u.username}@cinephiles.dev`,
+        email: `${u.username}@movie-review-platform.dev`,
         username: u.username,
         passwordHash: userHash,
         displayName: u.displayName,
