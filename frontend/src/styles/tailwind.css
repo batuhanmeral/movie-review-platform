@@ -9,7 +9,7 @@
    :root = koyu tema (varsayılan). html.light = açık tema override'ı. */
 :root {
   --color-surface: 20 24 28;        /* #14181C */
-  --color-surface-raised: 44 52 64; /* #2C3440 */
+  --color-surface-raised: 33 36 41; /* #212429 */
   --color-surface-muted: 63 75 91;  /* #3F4B5B */
   --color-surface-ring: 86 102 120; /* #566678 */
 
@@ -97,13 +97,13 @@ html.light {
   }
 
   /* Kart Yüzeyleri (%30 katman) */
-  /* Temel kart: yuvarlatılmış köşeler, yükseltilmiş arka plan, koyu zeminde hafif gölge */
+  /* Temel kart: yuvarlatılmış köşeler, yükseltilmiş arka plan, gölgesiz */
   .card {
-    @apply rounded-xl bg-surface-raised p-4 ring-1 ring-white/5 shadow-card;
+    @apply rounded-xl bg-surface-raised p-4 ring-1 ring-white/5;
   }
-  /* Etkileşimli kart: hover'da yukarı kayma ve glow efekti */
+  /* Etkileşimli kart: hover'da hafif yukarı kayma ve accent ring/glow */
   .card-hover {
-    @apply card transition-all duration-300 hover:-translate-y-1 hover:ring-accent/40 hover:shadow-glow;
+    @apply card transition-all duration-300 ease-spring hover:-translate-y-1 hover:ring-accent/50 hover:shadow-glow;
   }
 
   /* Glassmorphism Efekti */

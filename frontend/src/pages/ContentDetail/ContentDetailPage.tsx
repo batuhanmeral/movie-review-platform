@@ -79,7 +79,7 @@ export default function ContentDetailPage({ type }: ContentDetailPageProps) {
         <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-[260px,1fr] md:items-center">
           {/* Poster görseli */}
           {posterUrl ? (
-            <img src={posterUrl} alt={data.title} className="aspect-[2/3] w-full max-w-[260px] rounded-xl shadow-card ring-1 ring-white/10" />
+            <img src={posterUrl} alt={data.title} className="aspect-[2/3] w-full max-w-[260px] rounded-xl ring-1 ring-white/10" />
           ) : (
             <div className="aspect-[2/3] w-full max-w-[260px] rounded-xl bg-surface-muted ring-1 ring-white/10" />
           )}
@@ -169,7 +169,7 @@ export default function ContentDetailPage({ type }: ContentDetailPageProps) {
         <div role="dialog" aria-modal="true" aria-label={trailer.name} className="fixed inset-0 z-50 grid place-items-center bg-surface/80 p-4 backdrop-blur-md" onClick={() => setTrailerOpen(false)}>
           <div className="relative w-full max-w-4xl" onClick={(e) => e.stopPropagation()}>
             <button type="button" onClick={() => setTrailerOpen(false)} className="absolute -top-10 right-0 text-sm text-ink-muted hover:text-ink">✕ {t('content.close')}</button>
-            <div className="aspect-video overflow-hidden rounded-xl shadow-card ring-1 ring-white/10">
+            <div className="aspect-video overflow-hidden rounded-xl ring-1 ring-white/10">
               <iframe src={youtubeEmbed(trailer.key)} title={trailer.name} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="h-full w-full" />
             </div>
           </div>
