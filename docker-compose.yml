@@ -1,28 +1,28 @@
 # Compose proje adı sabit: container/volume adları klasör adından bağımsız kalır
-name: cinephiles
+name: movie-review-platform
 
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: cinephiles-postgres
+    container_name: movie-review-platform-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: cinephiles
-      POSTGRES_PASSWORD: cinephiles
-      POSTGRES_DB: cinephiles
+      POSTGRES_USER: movie_review_platform
+      POSTGRES_PASSWORD: movie_review_platform
+      POSTGRES_DB: movie_review_platform
     ports:
       - '5433:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U cinephiles -d cinephiles']
+      test: ['CMD-SHELL', 'pg_isready -U movie_review_platform -d movie_review_platform']
       interval: 10s
       timeout: 5s
       retries: 5
 
   redis:
     image: redis:7-alpine
-    container_name: cinephiles-redis
+    container_name: movie-review-platform-redis
     restart: unless-stopped
     ports:
       - '6379:6379'

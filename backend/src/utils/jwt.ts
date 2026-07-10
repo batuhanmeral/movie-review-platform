@@ -4,7 +4,7 @@ import { UnauthorizedError } from './errors.js';
 
 // Token'ları imzalarken yazılan ve doğrulanırken zorunlu tutulan issuer.
 // Başka bir servisin aynı secret ile ürettiği token'lar kabul edilmez.
-export const JWT_ISSUER = 'cinephiles-api';
+export const JWT_ISSUER = 'movie-review-platform-api';
 
 // Access token içerisine gömülecek veri tipi (Payload)
 export interface AccessTokenPayload {
