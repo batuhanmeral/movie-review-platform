@@ -39,7 +39,7 @@ the community.
 ## Project Structure
 
 ```
-cinephiles/
+movie-review-platform/
 ├── backend/                 # Express REST API
 │   ├── prisma/              # Schema, migrations and seed script
 │   └── src/
