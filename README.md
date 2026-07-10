@@ -1,10 +1,15 @@
 # Cinephiles
 
-> Social film & TV review platform — a TMDB-powered, full-stack cinema community.
+> Full-stack social movie & TV review platform powered by TMDB — rate what you
+> watch, share spoiler-protected reviews and build your own cinema community.
 
-Cinephiles is a social cinema platform where users discover, rate and review
-movies and TV shows, build collection lists, follow other users and engage with
-the community.
+Cinephiles turns the films and shows you watch into a diary worth sharing. Browse
+and search TMDB's catalog, rate titles on a half-star scale, and post
+spoiler-protected reviews — then organize everything into Watched, Watchlist,
+Favorites and custom lists you can share with others. A social layer of follows,
+mentions, an activity feed and in-app notifications keeps the community connected,
+while a dedicated admin panel with moderation tools keeps it healthy. It all works
+in both Turkish and English, with dark and light themes.
 
 ## Features
 
@@ -42,103 +47,49 @@ the community.
 movie-review-platform/
 ├── backend/                 # Express REST API
 │   ├── prisma/              # Schema, migrations and seed script
-│   └── src/
-│       ├── api/             # Feature modules: auth, content, users, reviews,
-│       │                    # lists, notifications, admin (routes/controller/
-│       │                    # service/validator per module)
-│       ├── config/          # Env validation, Prisma and Redis clients
-│       ├── middleware/      # Auth, role guard, Zod validation, rate limit,
-│       │                    # avatar upload, error handling
-│       ├── services/        # TMDB client, Redis cache, profanity filter
-│       └── utils/           # JWT, CSV, mentions, logger, HTTP errors
+│   └── src/                 # Feature modules (auth, content, users, reviews,
+│                            # lists, notifications, admin), middleware,
+│                            # services and utils
 ├── frontend/                # Vite + React SPA
 │   ├── public/locales/      # i18n translations (tr / en)
-│   └── src/
-│       ├── api/             # Typed Axios API clients
-│       ├── app/             # Router and app-level providers
-│       ├── components/      # Shared UI (layout, content cards, guards)
-│       ├── features/        # Feature state & UI (auth, review, notifications…)
-│       ├── hooks/           # Reusable hooks (debounce, click-outside…)
-│       ├── lib/             # i18n, TMDB helpers, small utilities
-│       ├── pages/           # Route-level pages (incl. admin panel)
-│       └── types/           # Shared TypeScript types
+│   └── src/                 # API clients, features, pages
+│                            # shared components, hooks and types
 ├── docker-compose.yml       # PostgreSQL + Redis for local development
-├── LICENSE                  # MIT
 └── package.json             # pnpm workspace root
 ```
 
-## Quick Start
+## Installation
 
-### 1. Prerequisites
-- Node.js 20+
-- pnpm 9+
-- Docker & Docker Compose
+Requires **Node.js 20+**, **pnpm 9+** and **Docker**.
 
-### 2. Start PostgreSQL and Redis
 ```bash
+# 1. PostgreSQL + Redis
 docker compose up -d
-```
 
-### 3. Backend
-```bash
+# 2. Backend → http://localhost:4000
 cd backend
 cp .env.example .env       # fill in TMDB_API_KEY and the JWT secrets
 pnpm install
-pnpm prisma migrate dev    # apply migrations
-pnpm seed                  # optional: seed demo data
-pnpm dev                   # http://localhost:4000
-```
+pnpm prisma migrate dev
+pnpm dev
 
-### 4. Frontend
-```bash
-cd frontend
+# 3. Frontend → http://localhost:5173
+cd ../frontend
 cp .env.example .env
 pnpm install
-pnpm dev                   # http://localhost:5173
+pnpm dev
 ```
 
-### Seed credentials
+## Screenshots
 
-After running `pnpm seed`, you can sign in with:
-
-| Role | Username | Password |
-|------|----------|----------|
-| Admin | `admin` | `admin123` |
-| User | `demo` | `user1234` |
-
-## Scripts
-
-### Root (workspace)
-| Command | Description |
-|---------|-------------|
-| `pnpm test` | Run every package's test suite |
-| `pnpm build` | Build every package |
-| `pnpm lint` | ESLint over the whole monorepo |
-
-### Backend
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Development server (tsx watch) |
-| `pnpm build` | TypeScript build |
-| `pnpm start` | Run production build |
-| `pnpm typecheck` | Type-check without emitting |
-| `pnpm test` | Vitest unit/integration tests |
-| `pnpm seed` | Seed the database with demo data |
-| `pnpm prisma:studio` | Prisma Studio (database browser) |
-
-### Frontend
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Vite dev server |
-| `pnpm build` | Type-check + production build |
-| `pnpm test` | Vitest unit tests |
-| `pnpm preview` | Preview the production build |
-
-## Testing
-
-Backend and frontend both use [Vitest](https://vitest.dev). Backend tests are
-hermetic: Prisma is mocked, so no database, Redis or `.env` file is required —
-they run out of the box in CI (`pnpm test` from the repo root).
+| Screenshots |
+|:-----------:|
+| **Home** — spotlight hero, weekly trending titles, popular reviews and community lists |
+| ![Home page](docs/home.png) |
+| **Content detail** — overview, cast, community ratings and spoiler-aware reviews |
+| ![Content detail page](docs/content.png) |
+| **Profile** — user stats, favorite titles & artists, custom lists and reviews |
+| ![Profile page](docs/profile.png) |
 
 ## License
 
