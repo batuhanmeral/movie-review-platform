@@ -6,6 +6,12 @@ function langFromI18n(i18nLang: string | undefined): Lang {
   return i18nLang?.startsWith('en') ? 'en-US' : 'tr-TR';
 }
 
+// Aktif dilden izleme sağlayıcıları için ülke kodu türetir.
+// TMDB katalogları ülkeye göre değişir: Türkçe arayüzde TR, İngilizcede US.
+function regionFromI18n(i18nLang: string | undefined): string {
+  return i18nLang?.startsWith('en') ? 'US' : 'TR';
+}
+
 // Keşfet sayfasındaki filtreleme seçenekleri için arayüz
 export interface DiscoverFilters {
   type?: TmdbType;
@@ -64,10 +70,10 @@ export const contentApi = {
     return data;
   },
 
-  // Belirli bir içeriğin detay bilgilerini getirir (oyuncular, fragmanlar vb.)
-  detail: async (type: TmdbType, tmdbId: number, language: Lang) => {
+  // Belirli bir içeriğin detay bilgilerini getirir (oyuncular, fragmanlar, nerede izlenir vb.)
+  detail: async (type: TmdbType, tmdbId: number, language: Lang, region = 'TR') => {
     const { data } = await apiClient.get<ContentDetail>(`/content/${type}/${tmdbId}`, {
-      params: { language },
+      params: { language, region },
     });
     return data;
   },
@@ -97,4 +103,4 @@ export const contentApi = {
   },
 };
 
-export { langFromI18n };
+export { langFromI18n, regionFromI18n };

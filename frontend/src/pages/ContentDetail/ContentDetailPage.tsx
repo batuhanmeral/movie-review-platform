@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { contentApi, langFromI18n } from '@/api/content.api';
+import { contentApi, langFromI18n, regionFromI18n } from '@/api/content.api';
 import { backdrop, poster, profile, youtubeEmbed, youtubeThumb } from '@/lib/tmdb';
 import { RatingStars } from '@/components/content/RatingStars';
 import { ContentCard } from '@/components/content/ContentCard';
 import { Slider } from '@/components/layout/Slider';
 import { ReviewsSection } from '@/features/review/ReviewsSection';
 import { ContentListActions } from '@/components/lists/ContentListActions';
+import { WatchProviders } from '@/components/content/WatchProviders';
 import type { TmdbType } from '@/types/content';
 
 interface ContentDetailPageProps {
@@ -21,12 +22,14 @@ export default function ContentDetailPage({ type }: ContentDetailPageProps) {
   const { tmdbId } = useParams<{ tmdbId: string }>();
   const { t, i18n } = useTranslation();
   const language = langFromI18n(i18n.resolvedLanguage);
+  // İzleme sağlayıcıları ülkeye göre değişir; ülke arayüz dilinden türetilir
+  const region = regionFromI18n(i18n.resolvedLanguage);
   const id = Number(tmdbId);
 
   // İçerik detay verisini API'den getir
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['content', type, id, language],
-    queryFn: () => contentApi.detail(type as TmdbType, id, language),
+    queryKey: ['content', type, id, language, region],
+    queryFn: () => contentApi.detail(type as TmdbType, id, language, region),
     enabled: Boolean(type && id),
   });
 
@@ -128,6 +131,9 @@ export default function ContentDetailPage({ type }: ContentDetailPageProps) {
                 <p className="mt-2 max-w-prose text-sm leading-relaxed text-ink/90">{data.overview}</p>
               </div>
             )}
+
+            {/* Nerede izlenir — yalnızca seçilen ülkede veri varsa */}
+            {data.watchProviders && <WatchProviders data={data.watchProviders} />}
 
             {/* Aksiyon butonları: liste aksiyonları (tek-tık İzledim/İzleyeceğim + Listeye Ekle) + fragman */}
             <div className="mt-6 flex flex-wrap gap-3">

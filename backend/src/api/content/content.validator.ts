@@ -58,9 +58,15 @@ export const detailParamsSchema = z.object({
   tmdbId: z.coerce.number().int().positive(),
 });
 
-// İçerik detayı sorgu parametreleri (yalnızca dil)
+// İçerik detayı sorgu parametreleri: dil + izleme sağlayıcıları için ülke kodu.
+// region ISO 3166-1 alpha-2 (TR, US, DE...); TMDB büyük harf bekler.
 export const detailQuerySchema = z.object({
   language: langSchema,
+  region: z
+    .string()
+    .regex(/^[A-Za-z]{2}$/, 'Ülke kodu iki harf olmalı')
+    .transform((v) => v.toUpperCase())
+    .default('TR'),
 });
 
 // Tür (genre) listesi; film/dizi için ayrı listeler döner

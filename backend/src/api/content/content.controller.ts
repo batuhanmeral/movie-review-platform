@@ -115,8 +115,8 @@ export const personHandler: RequestHandler = async (req, res, next) => {
 export const detailHandler: RequestHandler = async (req, res, next) => {
   try {
     const { type, tmdbId } = req.params as unknown as { type: tmdb.TmdbType; tmdbId: number };
-    const { language } = req.query as unknown as { language: tmdb.Lang };
-    const data = await getDetail(type, tmdbId, language);
+    const { language, region } = req.query as unknown as { language: tmdb.Lang; region: string };
+    const data = await getDetail(type, tmdbId, language, region);
     res.json(data);
   } catch (err) {
     next(err);

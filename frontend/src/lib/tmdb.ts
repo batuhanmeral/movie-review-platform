@@ -8,6 +8,8 @@ export type PosterSize = 'w92' | 'w154' | 'w185' | 'w342' | 'w500' | 'w780' | 'o
 export type BackdropSize = 'w300' | 'w780' | 'w1280' | 'original';
 // TMDB profil (oyuncu) görselleri için kullanılabilecek boyut seçenekleri
 export type ProfileSize = 'w45' | 'w185' | 'h632' | 'original';
+// TMDB platform logoları (izleme sağlayıcıları) için boyut seçenekleri
+export type LogoSize = 'w45' | 'w92' | 'w154' | 'original';
 
 // TMDB poster görseli için tam URL oluşturur
 // Poster yolu null ise null döner
@@ -18,6 +20,12 @@ export function poster(path: string | null, size: PosterSize = 'w342'): string |
 
 // TMDB arka plan görseli için tam URL oluşturur
 export function backdrop(path: string | null, size: BackdropSize = 'w1280'): string | null {
+  if (!path) return null;
+  return `${IMAGE_BASE}/${size}${path}`;
+}
+
+// TMDB platform logosu (izleme sağlayıcıları) için tam URL oluşturur
+export function providerLogo(path: string | null, size: LogoSize = 'w92'): string | null {
   if (!path) return null;
   return `${IMAGE_BASE}/${size}${path}`;
 }

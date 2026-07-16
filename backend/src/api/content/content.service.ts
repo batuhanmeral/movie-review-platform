@@ -8,8 +8,13 @@ const tmdbToPrisma = (t: tmdb.TmdbType): ContentType => (t === 'movie' ? 'MOVIE'
 // Belirli bir TMDB ID için içerik detayını getirir.
 // İçeriğin minimal bir kopyasını kendi veritabanımızda (Content tablosu) günceller veya oluşturur.
 // Kendi topluluğumuzun (platformdaki kullanıcıların) ortalama puanını (communityRating) sonuca ekler.
-export async function getDetail(type: tmdb.TmdbType, tmdbId: number, language: tmdb.Lang) {
-  const detail = await tmdb.detail(type, tmdbId, language);
+export async function getDetail(
+  type: tmdb.TmdbType,
+  tmdbId: number,
+  language: tmdb.Lang,
+  region = 'TR',
+) {
+  const detail = await tmdb.detail(type, tmdbId, language, region);
 
   // Upsert minimal cache row — sosyal etkileşim ilişkilerinin köşe taşı
   const content = await prisma.content.upsert({

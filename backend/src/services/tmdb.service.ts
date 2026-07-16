@@ -28,6 +28,24 @@ export interface TmdbPage<T> {
   results: T[];
 }
 
+// Bir içeriğin belirli bir ülkedeki tek bir izleme sağlayıcısı (Netflix, Prime vb.)
+export interface WatchProvider {
+  providerId: number;
+  name: string;
+  logoPath: string | null;
+}
+
+// Bir içeriğin belirli bir ülkedeki izleme seçenekleri.
+// flatrate: abonelikle dahil, rent: kiralama, buy: satın alma.
+// link: TMDB'nin o ülke için hazırladığı "nerede izlenir" sayfası.
+export interface WatchProviders {
+  region: string;
+  link: string | null;
+  flatrate: WatchProvider[];
+  rent: WatchProvider[];
+  buy: WatchProvider[];
+}
+
 export interface TmdbDetail extends TmdbItem {
   runtime: number | null;
   tagline: string | null;
@@ -37,6 +55,8 @@ export interface TmdbDetail extends TmdbItem {
   cast: { id: number; name: string; character: string; profilePath: string | null }[];
   videos: { key: string; site: string; type: string; name: string }[];
   recommendations: TmdbItem[];
+  // Seçilen ülkede içeriğin izlenebildiği platformlar; veri yoksa null
+  watchProviders: WatchProviders | null;
   lastAirDate?: string | null;
   status?: string;
   inProduction?: boolean;
@@ -67,6 +87,20 @@ interface RawItem {
   genre_ids?: number[];
 }
 
+interface RawWatchProvider {
+  provider_id: number;
+  provider_name: string;
+  logo_path: string | null;
+  display_priority?: number;
+}
+
+interface RawWatchProviderRegion {
+  link?: string;
+  flatrate?: RawWatchProvider[];
+  rent?: RawWatchProvider[];
+  buy?: RawWatchProvider[];
+}
+
 interface RawDetailResponse extends RawItem {
   runtime?: number | null;
   episode_run_time?: number[];
@@ -81,6 +115,10 @@ interface RawDetailResponse extends RawItem {
   };
   recommendations?: {
     results?: RawItem[];
+  };
+  // append_to_response ile gelir; anahtar TMDB'de tam olarak "watch/providers"
+  'watch/providers'?: {
+    results?: Record<string, RawWatchProviderRegion>;
   };
   // Diziler için yaratıcı(lar); film yönetmeni crew içindedir
   created_by?: { id: number; name: string }[];
@@ -204,6 +242,34 @@ function normalizePage<T extends RawItem>(
   };
 }
 
+// TMDB'nin ülke bazlı izleme sağlayıcılarını tek bir bölgeye indirger.
+// TMDB display_priority ile platformları kendi önem sırasına koyar; o sırayı koruruz.
+function normalizeProviders(
+  raw: RawDetailResponse['watch/providers'],
+  region: string,
+): WatchProviders | null {
+  const entry = raw?.results?.[region];
+  if (!entry) return null;
+
+  const map = (list?: RawWatchProvider[]): WatchProvider[] =>
+    [...(list ?? [])]
+      .sort((a, b) => (a.display_priority ?? 999) - (b.display_priority ?? 999))
+      .map((p) => ({
+        providerId: p.provider_id,
+        name: p.provider_name,
+        logoPath: p.logo_path,
+      }));
+
+  const flatrate = map(entry.flatrate);
+  const rent = map(entry.rent);
+  const buy = map(entry.buy);
+
+  // Ülke anahtarı var ama üç kategori de boşsa gösterilecek bir şey yok
+  if (flatrate.length === 0 && rent.length === 0 && buy.length === 0) return null;
+
+  return { region, link: entry.link ?? null, flatrate, rent, buy };
+}
+
 // TMDB'den dönen liste sayfalarını (search, discover vb.) normalize eder
 export async function search(
   query: string,
@@ -282,12 +348,19 @@ export async function discover(p: DiscoverParams) {
   });
 }
 
-// Belirli bir içeriğin detaylı bilgilerini, fragmanlarını ve oyuncu kadrosunu getirir
-export async function detail(type: TmdbType, id: number, language: Lang): Promise<TmdbDetail> {
-  return cached(`tmdb:detail:${type}:${id}:${language}`, TTL, async () => {
+// Belirli bir içeriğin detaylı bilgilerini, fragmanlarını, oyuncu kadrosunu ve
+// verilen ülkedeki izleme sağlayıcılarını getirir
+export async function detail(
+  type: TmdbType,
+  id: number,
+  language: Lang,
+  region = 'TR',
+): Promise<TmdbDetail> {
+  // Bölge cache anahtarına dahil: izleme sağlayıcıları ülkeye göre değişir
+  return cached(`tmdb:detail:${type}:${id}:${language}:${region}`, TTL, async () => {
     const raw = await tmdbFetch<RawDetailResponse>(`/${type}/${id}`, {
       language,
-      append_to_response: 'credits,videos,recommendations',
+      append_to_response: 'credits,videos,recommendations,watch/providers',
     });
     const base = normalize(raw, type);
     const runtime = type === 'movie' ? (raw.runtime ?? null) : (raw.episode_run_time?.[0] ?? null);
@@ -321,6 +394,8 @@ export async function detail(type: TmdbType, id: number, language: Lang): Promis
         .filter((r) => r.id && r.poster_path)
         .slice(0, 12)
         .map((r) => normalize(r, type)),
+      // "Nerede izlenir": seçilen ülkedeki abonelik/kiralama/satın alma seçenekleri
+      watchProviders: normalizeProviders(raw['watch/providers'], region),
     };
   });
 }

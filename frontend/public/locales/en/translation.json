@@ -121,7 +121,14 @@
     "tmdbVotes": "TMDB votes",
     "communityRating": "Community:",
     "reviews": "reviews",
-    "notFound": "Content not found."
+    "notFound": "Content not found.",
+    "whereToWatch": "Where to Watch",
+    "providers": {
+      "flatrate": "Stream",
+      "rent": "Rent",
+      "buy": "Buy",
+      "source": "Watch data provided by TMDB via JustWatch."
+    }
   },
   "profile": {
     "follow": "Follow",

@@ -121,7 +121,14 @@
     "tmdbVotes": "TMDB oyu",
     "communityRating": "Topluluk:",
     "reviews": "inceleme",
-    "notFound": "İçerik bulunamadı."
+    "notFound": "İçerik bulunamadı.",
+    "whereToWatch": "Nerede İzlenir",
+    "providers": {
+      "flatrate": "Abonelik",
+      "rent": "Kirala",
+      "buy": "Satın al",
+      "source": "İzleme verisi JustWatch aracılığıyla TMDB'den alınmıştır."
+    }
   },
   "profile": {
     "follow": "Takip et",

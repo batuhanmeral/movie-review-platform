@@ -45,6 +45,22 @@ export interface VideoMeta {
   name: string;   // Video başlığı
 }
 
+// Bir içeriğin belirli bir ülkedeki izleme sağlayıcısı (Netflix, Prime Video vb.)
+export interface WatchProvider {
+  providerId: number;
+  name: string;
+  logoPath: string | null;   // TMDB logo yolu
+}
+
+// İçeriğin seçilen ülkedeki izleme seçenekleri
+export interface WatchProviders {
+  region: string;            // ISO ülke kodu (TR, US...)
+  link: string | null;       // TMDB'nin "nerede izlenir" sayfası
+  flatrate: WatchProvider[]; // Abonelikle izlenebilir
+  rent: WatchProvider[];     // Kiralanabilir
+  buy: WatchProvider[];      // Satın alınabilir
+}
+
 // Film/dizi tür bilgisi
 export interface Genre {
   id: number;
@@ -110,6 +126,7 @@ export interface ContentDetail extends ContentItem {
   cast: CastMember[];               // Oyuncu kadrosu
   videos: VideoMeta[];               // Fragmanlar ve videolar
   recommendations?: ContentItem[];   // Benzer/önerilen içerikler (eski cache'te olmayabilir)
+  watchProviders?: WatchProviders | null; // Nerede izlenir (eski cache'te olmayabilir)
   contentId: string;                 // Sistemdeki içerik ID'si
   communityRating: number | null;    // Cinephiles topluluk puanı
   communityReviewCount: number;      // Topluluk inceleme sayısı
