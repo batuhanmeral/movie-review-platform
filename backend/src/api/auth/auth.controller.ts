@@ -41,3 +41,24 @@ export const logoutHandler: RequestHandler = async (req, res, next) => {
     next(err);
   }
 };
+
+// Şifre sıfırlama bağlantısı gönderir.
+// E-posta kayıtlı olmasa bile aynı yanıt döner (kullanıcı varlığı sızdırılmaz).
+export const forgotPasswordHandler: RequestHandler = async (req, res, next) => {
+  try {
+    await service.requestPasswordReset(req.body.email);
+    res.status(202).json({ message: 'Bağlantı gönderildi' }); // 202 Accepted
+  } catch (err) {
+    next(err);
+  }
+};
+
+// E-postayla gelen token ile yeni şifreyi belirler.
+export const resetPasswordHandler: RequestHandler = async (req, res, next) => {
+  try {
+    await service.resetPassword(req.body.token, req.body.password);
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+};

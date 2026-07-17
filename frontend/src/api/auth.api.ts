@@ -25,3 +25,14 @@ export async function login(identifier: string, password: string): Promise<AuthR
 export async function logout(refreshToken: string): Promise<void> {
   await apiClient.post('/auth/logout', { refreshToken });
 }
+
+// Şifre sıfırlama bağlantısı ister.
+// Backend, e-posta kayıtlı olmasa da aynı yanıtı döner (kullanıcı varlığı sızdırılmaz).
+export async function forgotPassword(email: string): Promise<void> {
+  await apiClient.post('/auth/forgot-password', { email });
+}
+
+// E-postadaki token ile yeni şifreyi belirler.
+export async function resetPassword(token: string, password: string): Promise<void> {
+  await apiClient.post('/auth/reset-password', { token, password });
+}

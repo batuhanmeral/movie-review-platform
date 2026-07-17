@@ -1,10 +1,11 @@
-import { randomUUID } from 'node:crypto';
+import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { Prisma, type User, ListType, Visibility } from '@prisma/client';
 import { prisma } from '../../config/db.js';
 import { env } from '../../config/env.js';
 import { hashPassword, verifyPassword } from '../../utils/password.js';
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../../utils/jwt.js';
-import { ConflictError, UnauthorizedError } from '../../utils/errors.js';
+import { BadRequestError, ConflictError, UnauthorizedError } from '../../utils/errors.js';
+import { sendPasswordResetEmail } from '../../services/email.service.js';
 import type { LoginInput, RegisterInput } from './auth.validator.js';
 
 const REFRESH_TTL_MS = parseDurationMs(env.JWT_REFRESH_TTL);
@@ -183,4 +184,73 @@ export async function logout(token: string): Promise<void> {
   } catch {
     // Geçersiz token üzerinden gelen logout sessizce başarılı sayılır
   }
+}
+
+// ŞİFRE SIFIRLAMA
+
+// Sıfırlama token'ı veritabanında düz metin tutulmaz; yalnızca SHA-256 özeti saklanır.
+function hashResetToken(token: string): string {
+  return createHash('sha256').update(token).digest('hex');
+}
+
+/**
+ * Şifre sıfırlama talebi oluşturur ve kullanıcıya e-posta gönderir.
+ *
+ * E-postanın kayıtlı olup olmadığı dışarıya sızdırılmaz: adres bulunamasa da
+ * fonksiyon sessizce başarılı döner (kullanıcı sayımı / enumeration önlemi).
+ */
+export async function requestPasswordReset(email: string): Promise<void> {
+  const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
+  // Askıya alınmış hesaplar için de sıfırlama akışı başlatılmaz
+  if (!user || user.isSuspended) return;
+
+  // Aynı kullanıcının bekleyen eski talepleri geçersiz kılınır: her an tek geçerli link
+  await prisma.passwordResetToken.updateMany({
+    where: { userId: user.id, usedAt: null },
+    data: { usedAt: new Date() },
+  });
+
+  const token = randomBytes(32).toString('hex');
+  await prisma.passwordResetToken.create({
+    data: {
+      tokenHash: hashResetToken(token),
+      userId: user.id,
+      expiresAt: new Date(Date.now() + env.PASSWORD_RESET_TTL_MINUTES * 60_000),
+    },
+  });
+
+  const resetUrl = `${env.WEB_APP_URL}/reset-password?token=${token}`;
+  await sendPasswordResetEmail(user.email, resetUrl, user.language);
+}
+
+/**
+ * Sıfırlama token'ı ile yeni şifreyi belirler.
+ *
+ * Başarılı sıfırlamada kullanıcının tüm refresh token'ları iptal edilir:
+ * hesabı ele geçiren taraf varsa açık oturumu da kapanır.
+ */
+export async function resetPassword(token: string, password: string): Promise<void> {
+  const record = await prisma.passwordResetToken.findUnique({
+    where: { tokenHash: hashResetToken(token) },
+    include: { user: true },
+  });
+
+  if (!record || record.usedAt || record.expiresAt < new Date()) {
+    throw new BadRequestError('Sıfırlama bağlantısı geçersiz veya süresi dolmuş');
+  }
+  if (record.user.isSuspended) throw new UnauthorizedError('Hesap askıya alınmış');
+
+  const passwordHash = await hashPassword(password);
+  await prisma.$transaction([
+    prisma.user.update({ where: { id: record.userId }, data: { passwordHash } }),
+    prisma.passwordResetToken.update({
+      where: { id: record.id },
+      data: { usedAt: new Date() },
+    }),
+    // Şifre değişti: mevcut tüm oturumlar düşürülür
+    prisma.refreshToken.updateMany({
+      where: { userId: record.userId, revoked: false },
+      data: { revoked: true },
+    }),
+  ]);
 }

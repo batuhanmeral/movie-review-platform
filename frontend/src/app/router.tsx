@@ -23,6 +23,8 @@ const MyListsPage = lazy(() => import('@/pages/Lists/MyListsPage'));
 const ContentDetailPage = lazy(() => import('@/pages/ContentDetail/ContentDetailPage'));
 const LoginPage = lazy(() => import('@/pages/Auth/LoginPage'));
 const RegisterPage = lazy(() => import('@/pages/Auth/RegisterPage'));
+const ForgotPasswordPage = lazy(() => import('@/pages/Auth/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('@/pages/Auth/ResetPasswordPage'));
 const ProfilePage = lazy(() => import('@/pages/Profile/ProfilePage'));
 const UserReviewsPage = lazy(() => import('@/pages/Profile/UserReviewsPage'));
 const PersonPage = lazy(() => import('@/pages/Person/PersonPage'));
@@ -90,6 +92,8 @@ export function AppRouter() {
           {/* Giriş ve kayıt sayfaları */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           {/* Kullanıcı profil sayfası - username parametresi ile */}
           <Route path="/u/:username" element={<ProfilePage />} />
           {/* Kullanıcının tüm incelemeleri */}

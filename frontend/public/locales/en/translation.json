@@ -46,8 +46,25 @@
       "usernameShort": "Username must be at least 3 characters",
       "usernameLong": "Username can be at most 24 characters",
       "usernamePattern": "Only lowercase, digits and _",
-      "unexpected": "Something went wrong"
-    }
+      "unexpected": "Something went wrong",
+      "passwordMismatch": "Passwords don't match"
+    },
+    "forgotLink": "Forgot password?",
+    "backToLogin": "Back to sign in",
+    "forgotTitle": "Reset your password",
+    "forgotSubtitle": "Enter your account's email address and we'll send you a reset link.",
+    "forgotSubmit": "Send link",
+    "forgotSending": "Sending…",
+    "forgotSentTitle": "Link sent",
+    "forgotSentBody": "If this address is registered, a password reset link is on its way to your inbox. The link is valid for 1 hour.",
+    "resetTitle": "Set a new password",
+    "resetSubtitle": "Enter your new password. All open sessions will be signed out.",
+    "newPassword": "New password",
+    "confirmPassword": "New password (again)",
+    "resetSubmit": "Update password",
+    "resetSubmitting": "Updating…",
+    "resetSuccess": "Your password has been updated. You can sign in with it now.",
+    "resetMissingToken": "This reset link is invalid. Please request a new one."
   },
   "home": {
     "hero": {

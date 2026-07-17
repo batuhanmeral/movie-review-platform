@@ -21,6 +21,24 @@ export const registerSchema = z.object({
   displayName: z.string().min(1).max(64).optional().or(z.literal('')), // Opsiyonel görünen ad
 });
 
+// Şifre sıfırlama talebi formu
+export const forgotPasswordSchema = z.object({
+  email: z.string().email('auth.errors.emailInvalid'),
+});
+
+// Yeni şifre belirleme formu; iki alanın eşleştiği de doğrulanır
+export const resetPasswordSchema = z
+  .object({
+    password: z.string().min(8, 'auth.errors.passwordShort').max(128, 'auth.errors.passwordLong'),
+    confirmPassword: z.string().min(1, 'auth.errors.passwordRequired'),
+  })
+  .refine((v) => v.password === v.confirmPassword, {
+    message: 'auth.errors.passwordMismatch',
+    path: ['confirmPassword'],
+  });
+
 // Şema tiplerinden TypeScript arayüzleri türet
 export type LoginValues = z.infer<typeof loginSchema>;
 export type RegisterValues = z.infer<typeof registerSchema>;
+export type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordValues = z.infer<typeof resetPasswordSchema>;

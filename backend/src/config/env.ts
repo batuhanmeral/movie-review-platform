@@ -14,7 +14,7 @@ const EnvSchema = z.object({
   APP_URL: z.string().url().default('http://localhost:4000'),
   // CORS politikası için izin verilen kaynak
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
-  // Frontend'in temel URL'i — e-postadaki bağlantılar buraya işaret eder
+  // Frontend'in temel URL'i — e-postadaki şifre sıfırlama linki buraya işaret eder
   WEB_APP_URL: z.string().url().default('http://localhost:5173'),
 
   // Veritabanı bağlantı URL'i
@@ -44,6 +44,9 @@ const EnvSchema = z.object({
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
   MAIL_FROM: z.string().default('Cinephiles <no-reply@cinephiles.local>'),
+
+  // Şifre sıfırlama bağlantısının geçerlilik süresi (dakika)
+  PASSWORD_RESET_TTL_MINUTES: z.coerce.number().int().positive().default(60),
 
   // Loglama seviyesi
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),

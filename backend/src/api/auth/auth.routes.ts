@@ -1,8 +1,21 @@
 import { Router } from 'express';
-import { loginHandler, logoutHandler, refreshHandler, registerHandler } from './auth.controller.js';
+import {
+  forgotPasswordHandler,
+  loginHandler,
+  logoutHandler,
+  refreshHandler,
+  registerHandler,
+  resetPasswordHandler,
+} from './auth.controller.js';
 import { validate } from '../../middleware/validate.middleware.js';
 import { authRateLimiter } from '../../middleware/rateLimit.middleware.js';
-import { loginSchema, refreshSchema, registerSchema } from './auth.validator.js';
+import {
+  forgotPasswordSchema,
+  loginSchema,
+  refreshSchema,
+  registerSchema,
+  resetPasswordSchema,
+} from './auth.validator.js';
 
 export const authRouter = Router();
 
@@ -17,3 +30,19 @@ authRouter.post('/refresh', validate(refreshSchema), refreshHandler);
 
 // Çıkış yapma endpoint'i.
 authRouter.post('/logout', logoutHandler);
+
+// Şifre sıfırlama bağlantısı talebi. Kötüye kullanımı sınırlamak için rate limit içerir.
+authRouter.post(
+  '/forgot-password',
+  authRateLimiter,
+  validate(forgotPasswordSchema),
+  forgotPasswordHandler,
+);
+
+// Token ile yeni şifre belirleme. Token deneme saldırılarına karşı rate limit içerir.
+authRouter.post(
+  '/reset-password',
+  authRateLimiter,
+  validate(resetPasswordSchema),
+  resetPasswordHandler,
+);

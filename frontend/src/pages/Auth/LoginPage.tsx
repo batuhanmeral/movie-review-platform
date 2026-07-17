@@ -17,6 +17,8 @@ export default function LoginPage() {
   const location = useLocation();
   const login = useAuthStore((s) => s.login);
   const [serverError, setServerError] = useState<string | null>(null);
+  // Şifre sıfırlama sonrası yönlendirmeyle gelen bilgi mesajı
+  const notice = (location.state as { notice?: string } | null)?.notice ?? null;
 
   // React Hook Form ile form yönetimi ve Zod doğrulaması
   const {
@@ -56,6 +58,11 @@ export default function LoginPage() {
       }
     >
       <form noValidate onSubmit={onSubmit} className="space-y-4">
+        {/* Şifre sıfırlama gibi akışlardan gelen bilgi mesajı */}
+        {notice && (
+          <div className="rounded-md bg-accent/10 px-3 py-2 text-sm text-accent">{notice}</div>
+        )}
+
         {/* Kullanıcı adı veya e-posta giriş alanı */}
         <div>
           <label className="label" htmlFor="identifier">{t('auth.identifier')}</label>
@@ -65,7 +72,12 @@ export default function LoginPage() {
 
         {/* Şifre giriş alanı */}
         <div>
-          <label className="label" htmlFor="password">{t('auth.password')}</label>
+          <div className="flex items-baseline justify-between">
+            <label className="label" htmlFor="password">{t('auth.password')}</label>
+            <Link to="/forgot-password" className="text-xs text-ink-muted hover:text-accent hover:underline">
+              {t('auth.forgotLink')}
+            </Link>
+          </div>
           <input id="password" type="password" autoComplete="current-password" className="input" placeholder="••••••••" {...register('password')} />
           {errors.password && <p className="form-error">{t(errors.password.message!)}</p>}
         </div>

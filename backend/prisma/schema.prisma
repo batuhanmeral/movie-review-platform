@@ -96,6 +96,7 @@ model User {
   reportsFiled     Report[]        @relation("Reporter")
   activities       Activity[]
   refreshTokens    RefreshToken[]
+  passwordResets   PasswordResetToken[]
 
   @@index([username])
   @@index([email])
@@ -109,6 +110,21 @@ model RefreshToken {
   expiresAt DateTime
   revoked   Boolean  @default(false)
   createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// Şifre sıfırlama talebi.
+// Token'ın kendisi değil SHA-256 özeti saklanır: veritabanı sızsa bile
+// eldeki kayıtlarla sıfırlama linki üretilemez.
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  tokenHash String    @unique
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
 
   @@index([userId])
 }

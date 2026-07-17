@@ -46,8 +46,25 @@
       "usernameShort": "Kullanıcı adı en az 3 karakter",
       "usernameLong": "Kullanıcı adı en fazla 24 karakter",
       "usernamePattern": "Sadece küçük harf, rakam ve _ kullan",
-      "unexpected": "Beklenmeyen bir hata oluştu"
-    }
+      "unexpected": "Beklenmeyen bir hata oluştu",
+      "passwordMismatch": "Şifreler eşleşmiyor"
+    },
+    "forgotLink": "Şifremi unuttum",
+    "backToLogin": "Girişe dön",
+    "forgotTitle": "Şifreni sıfırla",
+    "forgotSubtitle": "Hesabının e-posta adresini gir, sıfırlama bağlantısını gönderelim.",
+    "forgotSubmit": "Bağlantı gönder",
+    "forgotSending": "Gönderiliyor…",
+    "forgotSentTitle": "Bağlantıyı gönderdik",
+    "forgotSentBody": "Bu adres kayıtlıysa şifre sıfırlama bağlantısı e-posta kutuna ulaşacak. Bağlantı 1 saat boyunca geçerli.",
+    "resetTitle": "Yeni şifre belirle",
+    "resetSubtitle": "Yeni şifreni gir. Sıfırlamadan sonra açık oturumların kapanır.",
+    "newPassword": "Yeni şifre",
+    "confirmPassword": "Yeni şifre (tekrar)",
+    "resetSubmit": "Şifremi güncelle",
+    "resetSubmitting": "Güncelleniyor…",
+    "resetSuccess": "Şifren güncellendi. Yeni şifrenle giriş yapabilirsin.",
+    "resetMissingToken": "Sıfırlama bağlantısı geçersiz. Lütfen yeni bir bağlantı iste."
   },
   "home": {
     "hero": {
