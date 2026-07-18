@@ -227,6 +227,10 @@
     "switchToLight": "Switch to light theme",
     "switchToDark": "Switch to dark theme"
   },
+  "language": {
+    "switchToEnglish": "Switch to English",
+    "switchToTurkish": "Switch to Turkish"
+  },
   "settings": {
     "title": "Settings",
     "subtitle": "Manage your account and app preferences.",

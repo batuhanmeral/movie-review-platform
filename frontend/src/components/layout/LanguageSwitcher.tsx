@@ -1,40 +1,26 @@
 import { useTranslation } from 'react-i18next';
 
-// Desteklenen dil seçenekleri
-const LANGS = [
-  { code: 'tr', label: 'TR' },
-  { code: 'en', label: 'EN' },
-] as const;
-
-// Navbar'daki dil değiştirme bileşeni
-// Radyo buton grubu olarak TR/EN arasında geçiş sağlar
-// Sadece küçük ekranların üstünde (sm+) görünür
+// Navbar'daki dil değiştirme butonu.
+// Yalnızca aktif dilin kodunu (TR / EN) gösterir; basıldığında diğer dile geçer.
+// Sadece küçük ekranların üstünde (sm+) görünür.
 export function LanguageSwitcher() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isTurkish = i18n.resolvedLanguage !== 'en';
+
+  // Basınca geçilecek dil ve butonda yazan aktif dilin kodu
+  const nextCode = isTurkish ? 'en' : 'tr';
+  const activeLabel = isTurkish ? 'TR' : 'EN';
+  const hint = isTurkish ? t('language.switchToEnglish') : t('language.switchToTurkish');
+
   return (
-    <div
-      role="radiogroup"
-      aria-label="Language"
-      className="hidden items-center gap-0.5 rounded-full bg-surface-raised p-0.5 ring-1 ring-white/5 sm:flex"
+    <button
+      type="button"
+      onClick={() => void i18n.changeLanguage(nextCode)}
+      aria-label={hint}
+      title={hint}
+      className="hidden h-9 min-w-9 place-items-center rounded-full bg-surface-raised px-2.5 text-[11px] font-bold text-ink-muted ring-1 ring-white/5 transition-colors hover:text-ink sm:grid"
     >
-      {LANGS.map(({ code, label }) => {
-        const active = i18n.resolvedLanguage === code;
-        return (
-          <button
-            key={code}
-            type="button"
-            role="radio"
-            aria-checked={active}
-            onClick={() => void i18n.changeLanguage(code)}
-            className={
-              'rounded-full px-2.5 py-1 text-[11px] font-bold transition-colors ' +
-              (active ? 'bg-accent text-surface' : 'text-ink-muted hover:text-ink')
-            }
-          >
-            {label}
-          </button>
-        );
-      })}
-    </div>
+      {activeLabel}
+    </button>
   );
 }

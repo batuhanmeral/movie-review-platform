@@ -227,6 +227,10 @@
     "switchToLight": "Açık temaya geç",
     "switchToDark": "Koyu temaya geç"
   },
+  "language": {
+    "switchToEnglish": "İngilizceye geç",
+    "switchToTurkish": "Türkçeye geç"
+  },
   "settings": {
     "title": "Ayarlar",
     "subtitle": "Hesap ve uygulama tercihlerini yönet.",
