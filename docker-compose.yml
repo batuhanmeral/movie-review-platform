@@ -25,7 +25,9 @@ services:
     container_name: movie-review-platform-redis
     restart: unless-stopped
     ports:
-      - '6379:6379'
+      # Sistemde başka bir Redis 6379'u kullanıyor olabilir; postgres'te olduğu
+      # gibi host tarafında varsayılan dışı bir port kullanılır.
+      - '6380:6379'
     volumes:
       - redis_data:/data
     healthcheck:
