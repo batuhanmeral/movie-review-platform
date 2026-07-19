@@ -54,10 +54,11 @@ export const contentApi = {
     return data;
   },
 
-  // Yakında vizyona girecek filmleri getirir
-  upcoming: async (language: Lang, page = 1) => {
+  // Yakında vizyona girecek filmleri getirir.
+  // region vizyon tarihlerinin hangi ülkeye göre döneceğini belirler.
+  upcoming: async (language: Lang, page = 1, region = 'TR') => {
     const { data } = await apiClient.get<ContentPage>('/content/upcoming', {
-      params: { language, page },
+      params: { language, page, region },
     });
     return data;
   },

@@ -306,9 +306,12 @@ export async function popular(type: TmdbType, page: number, language: Lang) {
 }
 
 // Yakında çıkacak (upcoming) filmleri getirir
-export async function upcoming(page: number, language: Lang) {
-  return cached(`tmdb:upcoming:movie:${language}:${page}`, TTL, async () => {
-    const raw = await tmdbFetch<RawListResponse>('/movie/upcoming', { page, language });
+export async function upcoming(page: number, language: Lang, region = 'TR') {
+  // region ZORUNLU sayılır: TMDB bölge verilmediğinde her filmin küresel ilk
+  // vizyon tarihini döner ve popüler yapımlar için bu tarih çoktan geçmiş olur.
+  // Bölge verildiğinde o ülkenin vizyon tarihleri gelir — "yakında" gerçekten yakında olur.
+  return cached(`tmdb:upcoming:movie:${language}:${region}:${page}`, TTL, async () => {
+    const raw = await tmdbFetch<RawListResponse>('/movie/upcoming', { page, language, region });
     return normalizePage(raw, 'movie');
   });
 }

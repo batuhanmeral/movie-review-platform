@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ContentCard } from '@/components/content/ContentCard';
 import { PosterSkeleton } from '@/components/content/PosterSkeleton';
 import { Slider } from '@/components/layout/Slider';
-import { contentApi, langFromI18n } from '@/api/content.api';
+import { contentApi, langFromI18n, regionFromI18n } from '@/api/content.api';
 import { reviewsApi } from '@/api/reviews.api';
 import { listsApi } from '@/api/lists.api';
 import { backdrop, poster } from '@/lib/tmdb';
@@ -20,6 +20,8 @@ import type { ContentItem } from '@/types/content';
 export default function HomePage() {
   const { t, i18n } = useTranslation();
   const language = langFromI18n(i18n.resolvedLanguage);
+  // Vizyon tarihleri ülkeye göre değişir; ülke arayüz dilinden türetilir
+  const region = regionFromI18n(i18n.resolvedLanguage);
 
   // Haftalık trend içerikler (hero bölümü için)
   const trending = useQuery({
@@ -37,8 +39,8 @@ export default function HomePage() {
 
   // Yakında vizyona girecek filmler
   const upcoming = useQuery({
-    queryKey: ['upcoming', language],
-    queryFn: () => contentApi.upcoming(language, 1),
+    queryKey: ['upcoming', language, region],
+    queryFn: () => contentApi.upcoming(language, 1, region),
     staleTime: 60 * 60 * 1000,
   });
   // Son 7 günün popüler incelemeleri

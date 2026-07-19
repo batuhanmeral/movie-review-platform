@@ -4,6 +4,13 @@ import { z } from 'zod';
 const langSchema = z.enum(['tr-TR', 'en-US']).default('tr-TR');
 // İçerik türü: film veya dizi
 const typeSchema = z.enum(['movie', 'tv']);
+// Ülke kodu (ISO 3166-1 alpha-2). TMDB büyük harf bekler.
+// İzleme sağlayıcıları ve vizyon tarihleri ülkeye göre değişir.
+const regionSchema = z
+  .string()
+  .regex(/^[A-Za-z]{2}$/, 'Ülke kodu iki harf olmalı')
+  .transform((v) => v.toUpperCase())
+  .default('TR');
 
 // Arama sorgusu; 'multi' film+dizi karışık sonuç döndürür, sayfa TMDB sınırı 500
 export const searchSchema = z.object({
@@ -27,10 +34,12 @@ export const popularSchema = z.object({
   language: langSchema,
 });
 
-// Yakında çıkacak içerikler, sayfalı
+// Yakında çıkacak içerikler, sayfalı. region vizyon tarihlerinin hangi ülkeye
+// göre döneceğini belirler.
 export const upcomingSchema = z.object({
   page: z.coerce.number().int().min(1).max(500).default(1),
   language: langSchema,
+  region: regionSchema,
 });
 
 // Gelişmiş keşif; yıl, tür, minimum puan ve sıralama ölçütüne göre filtreleme
@@ -58,15 +67,10 @@ export const detailParamsSchema = z.object({
   tmdbId: z.coerce.number().int().positive(),
 });
 
-// İçerik detayı sorgu parametreleri: dil + izleme sağlayıcıları için ülke kodu.
-// region ISO 3166-1 alpha-2 (TR, US, DE...); TMDB büyük harf bekler.
+// İçerik detayı sorgu parametreleri: dil + izleme sağlayıcıları için ülke kodu
 export const detailQuerySchema = z.object({
   language: langSchema,
-  region: z
-    .string()
-    .regex(/^[A-Za-z]{2}$/, 'Ülke kodu iki harf olmalı')
-    .transform((v) => v.toUpperCase())
-    .default('TR'),
+  region: regionSchema,
 });
 
 // Tür (genre) listesi; film/dizi için ayrı listeler döner

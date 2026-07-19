@@ -52,8 +52,12 @@ export const popularHandler: RequestHandler = async (req, res, next) => {
 // TMDB API üzerinden yakında çıkacak filmleri getirir
 export const upcomingHandler: RequestHandler = async (req, res, next) => {
   try {
-    const { page, language } = req.query as unknown as { page: number; language: tmdb.Lang };
-    const data = await tmdb.upcoming(page, language);
+    const { page, language, region } = req.query as unknown as {
+      page: number;
+      language: tmdb.Lang;
+      region: string;
+    };
+    const data = await tmdb.upcoming(page, language, region);
     res.json(data);
   } catch (err) {
     next(err);
