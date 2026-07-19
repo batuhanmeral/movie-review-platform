@@ -8,10 +8,10 @@
 /* Tema renk değişkenleri (RGB üçlüleri — Tailwind alpha modifier'ları için).
    :root = koyu tema (varsayılan). html.light = açık tema override'ı. */
 :root {
-  --color-surface: 20 24 28;        /* #14181C */
-  --color-surface-raised: 33 36 41; /* #212429 */
-  --color-surface-muted: 63 75 91;  /* #3F4B5B */
-  --color-surface-ring: 86 102 120; /* #566678 */
+  --color-surface: 11 14 18;        /* #0B0E12 — siyaha yakın soğuk kömür */
+  --color-surface-raised: 27 30 37; /* #1B1E25 — kartlar/navbar */
+  --color-surface-muted: 35 41 49;  /* #232931 — hover, ikincil yüzeyler */
+  --color-surface-ring: 57 66 78;   /* #39424E — kenarlıklar */
 
   --color-accent: 16 185 129;       /* #10B981 */
   --color-accent-cyan: 6 182 212;   /* #06B6D4 */
