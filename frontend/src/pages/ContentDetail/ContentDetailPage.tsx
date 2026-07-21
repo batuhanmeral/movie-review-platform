@@ -44,7 +44,7 @@ export default function ContentDetailPage({ type }: ContentDetailPageProps) {
   }
 
   const backdropUrl = backdrop(data.backdropPath, 'w1280');
-  const posterUrl = poster(data.posterPath, 'w500');
+  const posterUrl = poster(data.posterPath, 'w780');
   const year = data.releaseDate ? new Date(data.releaseDate).getFullYear() : null;
   const lastYear = data.lastAirDate ? new Date(data.lastAirDate).getFullYear() : null;
   
@@ -79,12 +79,12 @@ export default function ContentDetailPage({ type }: ContentDetailPageProps) {
           </>
         )}
 
-        <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-[260px,1fr] md:items-center">
+        <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-[340px,1fr] md:gap-12 md:items-center">
           {/* Poster görseli */}
           {posterUrl ? (
-            <img src={posterUrl} alt={data.title} className="aspect-[2/3] w-full max-w-[260px] rounded-xl ring-1 ring-white/10" />
+            <img src={posterUrl} alt={data.title} className="aspect-[2/3] w-full max-w-[340px] rounded-xl ring-1 ring-white/10" />
           ) : (
-            <div className="aspect-[2/3] w-full max-w-[260px] rounded-xl bg-surface-muted ring-1 ring-white/10" />
+            <div className="aspect-[2/3] w-full max-w-[340px] rounded-xl bg-surface-muted ring-1 ring-white/10" />
           )}
 
           <div className="text-balance">
@@ -221,8 +221,8 @@ export default function ContentDetailPage({ type }: ContentDetailPageProps) {
 function DetailSkeleton() {
   return (
     <div className="space-y-10">
-      <div className="grid gap-8 md:grid-cols-[260px,1fr]">
-        <div className="aspect-[2/3] w-full max-w-[260px] animate-pulse rounded-xl bg-surface-muted" />
+      <div className="grid gap-8 md:grid-cols-[340px,1fr] md:gap-12">
+        <div className="aspect-[2/3] w-full max-w-[340px] animate-pulse rounded-xl bg-surface-muted" />
         <div className="space-y-3">
           <div className="h-10 w-2/3 animate-pulse rounded bg-surface-muted" />
           <div className="h-4 w-1/2 animate-pulse rounded bg-surface-muted" />
