@@ -80,6 +80,22 @@ pnpm install
 pnpm dev
 ```
 
+## Testing
+
+Tests use **Vitest**. Backend services and middleware are unit-tested with a
+mocked Prisma client, so no database, Redis or `.env` file is needed. The health
+endpoint has an HTTP-level test with Supertest.
+
+```bash
+pnpm test                            # backend + frontend
+pnpm --filter ./backend test         # backend only
+pnpm lint                            # ESLint
+pnpm --filter ./backend typecheck    # TypeScript
+```
+
+GitHub Actions runs lint, typecheck, tests and the build on every push to `main`
+and on every pull request.
+
 ## Screenshots
 
 | Screenshots |
