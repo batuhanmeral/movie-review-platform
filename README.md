@@ -44,7 +44,7 @@ in both Turkish and English, with dark and light themes.
 ## Project Structure
 
 ```
-movie-review-platform/
+movie-tv-review/
 ├── backend/                 # Express REST API
 │   ├── prisma/              # Schema, migrations and seed script
 │   └── src/                 # Feature modules (auth, content, users, reviews,
